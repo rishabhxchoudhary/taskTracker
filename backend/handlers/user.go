@@ -35,7 +35,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 func GetUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-	user, err := database.GetUserByID(id)
+	user, err := database.GetUserByUsername(id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return

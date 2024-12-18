@@ -1,6 +1,7 @@
 package router
 
 import (
+	"backend/handlers"
 	"backend/middleware"
 	"net/http"
 
@@ -19,12 +20,12 @@ func NewRouter() *mux.Router {
 		w.Write([]byte("success"))
 	}).Methods("GET")
 
-	// userRouter := api.PathPrefix("/user").Subrouter()
-	// userRouter.HandleFunc("", handlers.GetAllUsers).Methods("GET")
-	// userRouter.HandleFunc("", handlers.CreateUser).Methods("POST")
-	// userRouter.HandleFunc("/{id}", handlers.GetUser).Methods("GET")
-	// userRouter.HandleFunc("/{id}", handlers.UpdateUser).Methods("PUT")
-	// userRouter.HandleFunc("/{id}", handlers.DeleteUser).Methods("DELETE")
+	userRouter := api.PathPrefix("/user").Subrouter()
+	userRouter.HandleFunc("", handlers.GetAllUsers).Methods("GET")
+	userRouter.HandleFunc("", handlers.CreateUser).Methods("POST")
+	userRouter.HandleFunc("/{id}", handlers.GetUser).Methods("GET")
+	userRouter.HandleFunc("/{id}", handlers.UpdateUser).Methods("PUT")
+	userRouter.HandleFunc("/{id}", handlers.DeleteUser).Methods("DELETE")
 
 	// Project routes
 	// projectRouter := api.PathPrefix("/project").Subrouter()
