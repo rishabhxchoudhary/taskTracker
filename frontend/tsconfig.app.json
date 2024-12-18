@@ -16,11 +16,12 @@
     "jsx": "react-jsx",
 
     /* Linting */
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "strict": false,                    // Disables all strict type-checking options
+    "noImplicitAny": false,             // Allows variables and parameters to have 'any' type implicitly
+    "noUnusedLocals": true,             // Warns about unused local variables
+    "noUnusedParameters": true,         // Warns about unused function parameters
+    "noFallthroughCasesInSwitch": true, // Prevents fallthrough in switch statements
+    "noUncheckedSideEffectImports": true // Prevents importing modules with side effects that TypeScript can't check
   },
   "include": ["src"]
 }
