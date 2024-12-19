@@ -13,7 +13,7 @@ import {
 } from "@nextui-org/react";
 import { DatePicker } from "@nextui-org/react";
 import { getLocalTimeZone, today } from "@internationalized/date";
-
+import React from "react";
 import { useAuth } from "../hooks/AuthContext";
 export function NavbarComponent() {
   const auth = useAuth();

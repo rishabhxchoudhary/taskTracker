@@ -1,6 +1,6 @@
 // src/api/users.ts
 import client from './client';
-import { User } from '../../types/User'
+import { User } from '../../types/types'
 
 export const getUsers = async (): Promise<User[]> => {
   const response = await client.get<User[]>('/users');

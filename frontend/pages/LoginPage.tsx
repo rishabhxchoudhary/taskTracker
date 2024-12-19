@@ -1,3 +1,4 @@
+import React, { useEffect } from "react";
 import {
   Card,
   CardHeader,
@@ -9,18 +10,13 @@ import {
 } from "@nextui-org/react";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import { useAuth } from "../hooks/AuthContext";
-import React, { useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import Layout  from "../layouts/Layout";
-import axios from "axios";
+import { GoogleJWT } from "../types/types";
+import { googleLogin } from "../src/api/auth";
 
-interface GoogleJWT {
-  email: string;
-  name: string;
-  avatar: string;
-}
 
 export default function Login() {
   const navigate = useNavigate();
@@ -32,14 +28,16 @@ export default function Login() {
     }
   }, [auth?.user, navigate]);
 
-  const responseMessage = async (response: CredentialResponse) => {
+  const loginWithGoogle = async (response: CredentialResponse) => {
     console.log(response);
     if (response.credential) {
       const decoded: GoogleJWT = jwtDecode(response.credential);
       console.log("Decoded JWT:", decoded);
 
       // send this data to backend using axios
-
+      const data = await googleLogin(decoded);
+      console.log("Data", data)
+      
       Cookies.set(
         "user",
         JSON.stringify({
@@ -94,7 +92,7 @@ export default function Login() {
             </Link>
           </CardFooter>
           <CardBody>
-            <GoogleLogin onSuccess={responseMessage} />
+            <GoogleLogin onSuccess={loginWithGoogle} />
           </CardBody>
         </Card>
 
