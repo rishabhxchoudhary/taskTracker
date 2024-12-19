@@ -73,6 +73,18 @@ func GetUserByUsername(id string) (models.User, error) {
 	return user, nil
 }
 
+func GetUserByEmail(id string) (models.User, error) {
+	var user models.User
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	err := GetUserCollection().FindOne(ctx, bson.M{"email": id}).Decode(&user)
+	if err != nil {
+		return user, err
+	}
+	return user, nil
+}
+
 func UpdateUser(id string, user models.User) error {
 	objID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {

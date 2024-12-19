@@ -58,6 +58,17 @@ export default function Login() {
     }
   };
 
+  const loginFunction = async ()=>{
+      const data = {
+        "email": "rishabh26072003@gmail.com",
+        "name": "Rishabh Kumar",
+        "avatar": "https://lh3.googleusercontent.com/a/ACg8ocIoFnLXXusZy7z4N5ZGsUo9oZ4osbAOdDza1t7xw0se5a3ZtX1d=s96-c",
+    }
+    const data2 = await googleLogin(data);
+    console.log("Data", data2)
+
+  }
+
   return (
     <Layout>
       <div className="flex flex-col h-screen justify-center items-center bg-gray-100 dark:bg-gray-900">
@@ -86,7 +97,7 @@ export default function Login() {
             </div>
           </CardBody>
           <CardFooter className="flex flex-col space-y-2">
-            <Button className="w-full">Login</Button>
+            <Button className="w-full" onPress={loginFunction}>Login</Button>
             <Link href="#" className="text-sm text-center">
               Forgot Password?
             </Link>
