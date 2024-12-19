@@ -1,4 +1,5 @@
 import { Card, CardHeader, CardFooter, Button, Link, Input } from "@nextui-org/react";
+import React from "react";
 
 export default function Register() {
   return (
