@@ -18,6 +18,8 @@ func GenerateJWT(user models.User) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id": user.ID,
 		"email":   user.Email,
+		"name":    user.Name,
+		"created_at": user.CreatedAt,
 		"exp":     time.Now().Add(time.Hour * 72).Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -30,16 +32,14 @@ func GoogleLogin(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	fmt.Println(body.Avatar)
-	fmt.Println(body.Name)
-	fmt.Println(body.Email)
-
 	user, err := database.GetUserByEmail(body.Email)
 	if err != nil {
 		newUser := models.User{
 			Name:  body.Name,
 			Email: body.Email,
+			CreatedAt: time.Now().Unix(),
 		}
+
 		if err := database.CreateUser(newUser); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -83,13 +83,7 @@ func CurrentUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		userID := claims["user_id"].(string)
-		user, err := database.GetUserByID(userID)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		json.NewEncoder(w).Encode(user)
+		json.NewEncoder(w).Encode(claims)
 	}
 }
 

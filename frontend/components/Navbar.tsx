@@ -12,9 +12,21 @@ import {
   DropdownMenu,
 } from "@nextui-org/react";
 import { DatePicker } from "@nextui-org/react";
-import { getLocalTimeZone, today } from "@internationalized/date";
+import { getLocalTimeZone, today, CalendarDate } from "@internationalized/date";
 import React from "react";
 import { useAuth } from "../hooks/AuthContext";
+
+
+function convertTimestampToCalendarDate(unixTimestamp) {
+  // If the timestamp is in seconds, convert it to milliseconds
+  const date = new Date(unixTimestamp * 1000);
+  
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1; // getMonth() returns 0-11
+  const day = date.getDate();
+  
+  return new CalendarDate(year, month, day);
+}
 export function NavbarComponent() {
   const auth = useAuth();
   return (
@@ -24,12 +36,12 @@ export function NavbarComponent() {
       </NavbarBrand>
 
       <NavbarContent justify="end">
-        {auth && auth.user && (
+        {auth && auth.user && auth?.user?.created_at && (
           <NavbarItem>
             <DatePicker
-              defaultValue={today(getLocalTimeZone()).subtract({ days: 1 })}
+              defaultValue={today(getLocalTimeZone())}
               label=""
-              minValue={today(getLocalTimeZone())}
+              minValue={convertTimestampToCalendarDate(auth?.user?.created_at)}
             />
           </NavbarItem>
         )}

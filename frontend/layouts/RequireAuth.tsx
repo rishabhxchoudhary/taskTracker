@@ -5,7 +5,9 @@ import React from 'react';
 function RequireAuth({ children }: { children: React.ReactNode }) {
     const auth = useAuth();
     const location = useLocation();
-
+    if (auth.status === 'loading') {
+        return <></>;
+    }
     if (!auth || !auth.user) {
         return <Navigate to="/login" state={{ from: location }} replace />;
     }

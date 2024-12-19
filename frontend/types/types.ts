@@ -4,6 +4,7 @@ export interface User {
     email: string;
     avatar: string;
     name: string;
+    created_at: Date;
 }
 
 export interface GoogleJWT {

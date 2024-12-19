@@ -1,6 +1,5 @@
 import  { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import React from 'react';
-import Cookies from 'js-cookie';
 import { User } from '../types/types';
 import { getCurrentUser, logoutUser } from '../src/api/auth';
 
@@ -8,14 +7,14 @@ interface AuthContextType {
     user: User | null;
     login: (User: User) => void;
     logout: () => void;
+    status: string
 }
-
-
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
+    console.log("user", user)
     const [status, setStatus] = useState('loading');
     useEffect(() => {
         console.log("useEffect called");
@@ -34,10 +33,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
-    if (status === 'loading') {
-        return <></>
-    }
-
     const login = async  (userData: User) => {
         setUser(userData);
         await refreshUser();
@@ -49,7 +44,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout }}>
+        <AuthContext.Provider value={{ user, login, logout, status }}>
             {children}
         </AuthContext.Provider>
     );

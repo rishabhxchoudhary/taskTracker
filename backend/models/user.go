@@ -8,8 +8,6 @@ type User struct {
 	Username  string             `json:"username" bson:"username"`
 	Email     string             `json:"email" bson:"email"`
 	Name      string             `json:"name" bson:"name"`
-	Password  string             `json:"password,omitempty" bson:"password,omitempty"` // Passwords should be hashed
-	CreatedAt primitive.DateTime `json:"created_at,omitempty" bson:"created_at,omitempty"`
+	CreatedAt int64              `json:"created_at,omitempty" bson:"created_at,omitempty"`
 	UpdatedAt primitive.DateTime `json:"updated_at,omitempty" bson:"updated_at,omitempty"`
-	// Add more fields as needed, such as Role, ProfileInfo, etc.
 }
