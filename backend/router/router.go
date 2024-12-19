@@ -33,6 +33,7 @@ func NewRouter() *mux.Router {
 
 	userRouter := api.PathPrefix("/user").Subrouter()
 	userRouter.HandleFunc("/googleLogin", handlers.GoogleLogin).Methods("POST")
-
+	userRouter.HandleFunc("/current_user", handlers.CurrentUser).Methods("GET")
+	userRouter.HandleFunc("/logout", handlers.Logout).Methods("GET")
 	return r
 }

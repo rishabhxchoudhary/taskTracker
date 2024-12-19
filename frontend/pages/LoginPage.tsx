@@ -11,7 +11,6 @@ import {
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import { useAuth } from "../hooks/AuthContext";
 import { jwtDecode } from "jwt-decode";
-import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import Layout  from "../layouts/Layout";
 import { GoogleJWT } from "../types/types";
@@ -32,41 +31,15 @@ export default function Login() {
     console.log(response);
     if (response.credential) {
       const decoded: GoogleJWT = jwtDecode(response.credential);
-      console.log("Decoded JWT:", decoded);
-
-      // send this data to backend using axios
       const data = await googleLogin(decoded);
       console.log("Data", data)
-      
-      Cookies.set(
-        "user",
-        JSON.stringify({
-          email: decoded.email,
-          username: decoded.name,
-          avatar: decoded.avatar,
-        }),
-        { expires: 7, sameSite: "Strict" }
-      );
-
-      auth?.login({
-        email: decoded.email,
-        username: decoded.name,
-        avatar: decoded.avatar,
-      });
-
+      auth?.login(data);
       navigate("/");
     }
   };
 
   const loginFunction = async ()=>{
-      const data = {
-        "email": "rishabh26072003@gmail.com",
-        "name": "Rishabh Kumar",
-        "avatar": "https://lh3.googleusercontent.com/a/ACg8ocIoFnLXXusZy7z4N5ZGsUo9oZ4osbAOdDza1t7xw0se5a3ZtX1d=s96-c",
-    }
-    const data2 = await googleLogin(data);
-    console.log("Data", data2)
-
+    
   }
 
   return (

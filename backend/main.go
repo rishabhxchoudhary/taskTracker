@@ -5,9 +5,12 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	godotenv.Load()
 	r := router.NewRouter()
 
 	port := "8000"

@@ -2,6 +2,7 @@ import  { createContext, useContext, useState, ReactNode, useEffect } from 'reac
 import React from 'react';
 import Cookies from 'js-cookie';
 import { User } from '../types/types';
+import { getCurrentUser, logoutUser } from '../src/api/auth';
 
 interface AuthContextType {
     user: User | null;
@@ -15,21 +16,36 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
-
+    const [status, setStatus] = useState('loading');
     useEffect(() => {
-        const userCookie = Cookies.get('user');
-        if (userCookie) {
-            setUser(JSON.parse(userCookie));
-        }
+        console.log("useEffect called");
+        refreshUser();
     }, []);
 
-    const login = (userData: User) => {
-        setUser(userData);
+    const refreshUser = async () => {
+        try {
+            const data = await getCurrentUser(); 
+            console.log("data", data);
+            setUser(data);
+            setStatus('authenticated')
+        } catch {
+            setUser(null);
+            setStatus('unauthenticated')
+        }
     };
 
-    const logout = () => {
-        Cookies.remove('user'); 
-        setUser(null);
+    if (status === 'loading') {
+        return <></>
+    }
+
+    const login = async  (userData: User) => {
+        setUser(userData);
+        await refreshUser();
+    };
+
+    const logout = async () => {
+        await logoutUser();
+        await refreshUser();
     };
 
     return (

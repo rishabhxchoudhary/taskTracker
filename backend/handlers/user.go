@@ -4,21 +4,10 @@ import (
 	"backend/database"
 	"backend/models"
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
 )
-
-func GoogleLogin(w http.ResponseWriter, r *http.Request) {
-	var user models.User
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	fmt.Println("user: ", user)
-	json.NewEncoder(w).Encode("")
-}
 
 func GetAllUsers(w http.ResponseWriter, r *http.Request) {
 	users, err := database.GetAllUsers()
