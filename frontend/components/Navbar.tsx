@@ -42,6 +42,7 @@ export function NavbarComponent() {
               defaultValue={today(getLocalTimeZone())}
               label=""
               minValue={convertTimestampToCalendarDate(auth?.user?.created_at)}
+              maxValue={today(getLocalTimeZone())}
             />
           </NavbarItem>
         )}
