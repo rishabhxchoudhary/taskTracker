@@ -36,3 +36,12 @@ export interface ProjectStore {
     setCurrentProject: (project: Project) => void;
     setCurrentDate: (date: CalendarDate) => void;
 }
+
+export interface TaskInterface {
+    id: number;
+    title: string;
+    description: string;
+    deadlineDate: CalendarDate | null;
+    priority: "low" | "medium" | "high" | "urgent";
+    status: number
+}

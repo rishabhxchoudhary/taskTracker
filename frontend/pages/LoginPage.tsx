@@ -16,7 +16,7 @@ import Layout  from "../layouts/Layout2";
 import { GoogleJWT } from "../types/types";
 import { googleLogin } from "../src/api/auth";
 import { useAuthStore } from "../store/authStore";
-import React from "react";
+// import React from "react";
 import { toast } from "sonner";
 
 export default function Login() {
