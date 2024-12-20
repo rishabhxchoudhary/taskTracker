@@ -1,4 +1,4 @@
-import React from 'react';
+// import React from 'react';
 import { NavbarComponent } from '../components/Navbar';
 
 function Layout({ children }) {

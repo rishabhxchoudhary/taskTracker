@@ -24,7 +24,7 @@ import { DatePicker } from "@nextui-org/react";
 import { getLocalTimeZone, today, CalendarDate } from "@internationalized/date";
 import { useAuthStore } from "../store/authStore";
 import { useProjectStore } from "../store/projectStore";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { createProject, deleteProject, getProjects } from "../src/api/project";
 import { Project } from "../types/types";
 import { MdDelete } from "react-icons/md";
