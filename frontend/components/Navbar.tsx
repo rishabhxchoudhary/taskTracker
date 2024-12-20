@@ -28,6 +28,7 @@ import React, { useEffect, useState } from "react";
 import { createProject, deleteProject, getProjects } from "../src/api/project";
 import { Project } from "../types/types";
 import { MdDelete } from "react-icons/md";
+import { Alert } from "@nextui-org/react";
 
 function convertTimestampToCalendarDate(unixTimestamp: number) {
   const date = new Date(unixTimestamp * 1000);
@@ -57,7 +58,6 @@ export function NavbarComponent() {
   const [newProjectName, setNewProjectName] = useState<string>("");
   const [newProjectDesc, setNewProjectDescription] = useState<string>("");
 
-
   useEffect(() => {
     const getUserProjects = async () => {
       const projects1: Project[] = await getProjects();
@@ -68,7 +68,7 @@ export function NavbarComponent() {
       }
     };
     getUserProjects();
-  },[projectStore]);
+  }, [projectStore]);
 
   const handleDeleteProject = async () => {
     if (projectToDelete) {
@@ -118,10 +118,13 @@ export function NavbarComponent() {
                       title={project.name}
                       onPress={() => projectStore.setCurrentProject(project)}
                       endContent={
-                        <Button isIconOnly onPress={() => {
-                          setProjectToDelete(project);
-                          onDeleteOpen()
-                          }}>
+                        <Button
+                          isIconOnly
+                          onPress={() => {
+                            setProjectToDelete(project);
+                            onDeleteOpen();
+                          }}
+                        >
                           <MdDelete className="w-4 h-4 " />
                         </Button>
                       }
@@ -130,7 +133,12 @@ export function NavbarComponent() {
                 </DropdownSection>
 
                 <DropdownSection aria-label="create-new-project">
-                  <DropdownItem key="create-new" startContent={<RiStickyNoteAddLine/>} title="Create New Project" onPress={() => onCreateOpen()} />
+                  <DropdownItem
+                    key="create-new"
+                    startContent={<RiStickyNoteAddLine />}
+                    title="Create New Project"
+                    onPress={() => onCreateOpen()}
+                  />
                 </DropdownSection>
               </DropdownMenu>
             </Dropdown>
@@ -197,6 +205,12 @@ export function NavbarComponent() {
         <ModalContent>
           {(onClose) => (
             <>
+              {projects.length == 1 && (
+                <Alert
+                  color="warning"
+                  title={`You have only 1 project. If you delete this, a new Sample Project will be created`}
+                />
+              )}
               <ModalHeader>Delete Project</ModalHeader>
               <ModalBody>
                 <p>
@@ -245,7 +259,9 @@ export function NavbarComponent() {
                 <Button
                   color="success"
                   onPress={handleCreateProject}
-                  isDisabled={(newProjectName.trim() === "") || (newProjectDesc.trim() === "")}
+                  isDisabled={
+                    newProjectName.trim() === "" || newProjectDesc.trim() === ""
+                  }
                 >
                   Create
                 </Button>
