@@ -29,6 +29,7 @@ import { createProject, deleteProject, getProjects } from "../src/api/project";
 import { Project } from "../types/types";
 import { MdDelete } from "react-icons/md";
 import { Alert } from "@nextui-org/react";
+import React from "react";
 
 function convertTimestampToCalendarDate(unixTimestamp: number) {
   const date = new Date(unixTimestamp * 1000);
@@ -116,6 +117,7 @@ export function NavbarComponent() {
                     <DropdownItem
                       key={project.id}
                       title={project.name}
+                      description={project.description.length > 50 ? project.description.slice(0, 50) + "..." : project.description}
                       onPress={() => projectStore.setCurrentProject(project)}
                       endContent={
                         <Button
@@ -149,7 +151,7 @@ export function NavbarComponent() {
               <DatePicker
                 defaultValue={today(getLocalTimeZone())}
                 minValue={convertTimestampToCalendarDate(
-                  projectStore?.currentProject?.created_at
+                  projectStore?.currentProject?.created_at || 0
                 )}
                 maxValue={today(getLocalTimeZone())}
                 aria-label="Select a date"
