@@ -14,25 +14,46 @@ import {
 import { DatePicker } from "@nextui-org/react";
 import { getLocalTimeZone, today, CalendarDate } from "@internationalized/date";
 import { useAuthStore } from "../store/authStore";
+import React, { useEffect } from "react";
+import { getProjects } from "../src/api/project";
+import { Project } from "../types/types";
 
-
-function convertTimestampToCalendarDate(unixTimestamp) {
-  // If the timestamp is in seconds, convert it to milliseconds
+function convertTimestampToCalendarDate(unixTimestamp: number) {
   const date = new Date(unixTimestamp * 1000);
-  
   const year = date.getFullYear();
-  const month = date.getMonth() + 1; // getMonth() returns 0-11
+  const month = date.getMonth() + 1;
   const day = date.getDate();
-  
   return new CalendarDate(year, month, day);
 }
+
 export function NavbarComponent() {
   const auth = useAuthStore((state)=> state);
+  const [projects, setProjects] = React.useState<Project[]>([]);
+
+  const getUserProjects = async () => {
+    const projects1: Project[] = await getProjects()
+    setProjects(projects1)
+  }
+
+  useEffect(()=>{
+    getUserProjects()
+  },[])
+
   return (
     <Navbar>
       <NavbarBrand>
         <p className="font-bold text-2xl">Task Tracker</p>
       </NavbarBrand>
+
+      {projects.map((p)=>{
+        return (
+          <NavbarItem>
+            <Link href={`/projects/${p.id}`}>
+              {p.name}
+            </Link>
+          </NavbarItem>
+        )
+      })}
 
       <NavbarContent justify="end">
         {auth && auth.user && auth?.user?.created_at && (

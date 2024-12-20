@@ -1,14 +1,6 @@
 import { create } from 'zustand';
-import { User } from '../types/types';
+import { AuthState, User } from '../types/types';
 import { getCurrentUser, logoutUser } from '../src/api/auth';
-
-interface AuthState {
-    user: User | null;
-    status: 'loading' | 'authenticated' | 'unauthenticated';
-    login: (userData: User) => Promise<void>;
-    logout: () => Promise<void>;
-    refreshUser: () => Promise<void>;
-}
 
 export const useAuthStore = create<AuthState>((set) => ({
     user: null,

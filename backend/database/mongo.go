@@ -53,3 +53,6 @@ func ConnectDB() {
 func GetUserCollection() *mongo.Collection {
 	return Client.Database("yourdbname").Collection("users")
 }
+func GetProjectCollection() *mongo.Collection {
+	return Client.Database("yourdbname").Collection("projects")
+}

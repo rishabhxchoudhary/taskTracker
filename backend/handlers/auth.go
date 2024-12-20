@@ -10,17 +10,18 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 var jwtSecret = []byte(os.Getenv("JWT_SECRET"))
 
 func GenerateJWT(user models.User) (string, error) {
 	claims := jwt.MapClaims{
-		"user_id": user.ID,
-		"email":   user.Email,
-		"name":    user.Name,
+		"user_id":    user.ID,
+		"email":      user.Email,
+		"name":       user.Name,
 		"created_at": user.CreatedAt,
-		"exp":     time.Now().Add(time.Hour * 72).Unix(),
+		"exp":        time.Now().Add(time.Hour * 72).Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(jwtSecret)
@@ -35,8 +36,8 @@ func GoogleLogin(w http.ResponseWriter, r *http.Request) {
 	user, err := database.GetUserByEmail(body.Email)
 	if err != nil {
 		newUser := models.User{
-			Name:  body.Name,
-			Email: body.Email,
+			Name:      body.Name,
+			Email:     body.Email,
 			CreatedAt: time.Now().Unix(),
 		}
 
@@ -66,11 +67,19 @@ func GoogleLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func CurrentUser(w http.ResponseWriter, r *http.Request) {
+	user, err := GetUserFromJWT(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+	json.NewEncoder(w).Encode(user)
+}
+
+func GetUserFromJWT(r *http.Request) (models.User, error) {
+	var user models.User
 	cookie, err := r.Cookie("auth_token")
 	if err != nil {
-		fmt.Println("cookie not found")
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
+		return user, fmt.Errorf("unauthorized: missing auth_token cookie")
 	}
 	token, err := jwt.Parse(cookie.Value, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -79,16 +88,27 @@ func CurrentUser(w http.ResponseWriter, r *http.Request) {
 		return jwtSecret, nil
 	})
 	if err != nil {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
+		return user, fmt.Errorf("unauthorized: invalid token")
 	}
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		json.NewEncoder(w).Encode(claims)
+		userIDStr, ok := claims["user_id"].(string)
+		if !ok {
+			return user, fmt.Errorf("unauthorized: invalid user_id type")
+		}
+		userID, err := primitive.ObjectIDFromHex(userIDStr)
+		if err != nil {
+			return user, fmt.Errorf("unauthorized: invalid user_id format")
+		}
+		user.ID = userID
+		user.CreatedAt = int64(claims["created_at"].(float64))
+		user.Name = claims["name"].(string)
+		user.Email = claims["email"].(string)
+		return user, nil
 	}
+	return user, fmt.Errorf("unauthorized: invalid token claims")
 }
 
 func Logout(w http.ResponseWriter, r *http.Request) {
-	// Clear the auth_token cookie by setting its expiration time to the past
 	http.SetCookie(w, &http.Cookie{
 		Name:     "auth_token",
 		Value:    "",
