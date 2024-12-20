@@ -30,3 +30,10 @@ func CreateProject(project models.Project) error {
 	_, err := GetProjectCollection().InsertOne(ctx, project)
 	return err
 }
+
+func DeleteProject(id primitive.ObjectID) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	_, err := GetProjectCollection().DeleteOne(ctx, bson.M{"_id": id})
+	return err
+}

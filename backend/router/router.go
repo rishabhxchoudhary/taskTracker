@@ -38,6 +38,8 @@ func NewRouter() *mux.Router {
 
 	projectRouter := api.PathPrefix("/project").Subrouter()
 	projectRouter.HandleFunc("", handlers.GetAllProjects).Methods("GET")
+	projectRouter.HandleFunc("", handlers.CreateProject).Methods("POST")
+	projectRouter.HandleFunc("/delete", handlers.DeleteProject).Methods("POST")
 
 	return r
 }

@@ -6,3 +6,17 @@ export const getProjects = async (): Promise<Project[]>  => {
     return response.data;
 }
 
+export const createProject = async (name: string, description: string): Promise<Project[]>  => {
+    const response = await client.post('/project', {
+        name,
+        description
+    });
+    return response.data;
+}
+
+export const deleteProject = async (id: string): Promise<Project[]>  => {
+    const response = await client.post(`/project/delete`,{
+        id
+    });
+    return response.data;
+}

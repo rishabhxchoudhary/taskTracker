@@ -25,7 +25,7 @@ import { getLocalTimeZone, today, CalendarDate } from "@internationalized/date";
 import { useAuthStore } from "../store/authStore";
 import { useProjectStore } from "../store/projectStore";
 import React, { useEffect, useState } from "react";
-import { getProjects } from "../src/api/project";
+import { createProject, deleteProject, getProjects } from "../src/api/project";
 import { Project } from "../types/types";
 import { MdDelete } from "react-icons/md";
 
@@ -57,29 +57,37 @@ export function NavbarComponent() {
   const [newProjectName, setNewProjectName] = useState<string>("");
   const [newProjectDesc, setNewProjectDescription] = useState<string>("");
 
-  const getUserProjects = async () => {
-    const projects1: Project[] = await getProjects();
-    setProjects(projects1);
-    // Optionally set the first project as current if none is selected
-    if (!projectStore.currentProject && projects1.length > 0) {
-      projectStore.setCurrentProject(projects1[0]);
-    }
-  };
 
   useEffect(() => {
+    const getUserProjects = async () => {
+      const projects1: Project[] = await getProjects();
+      setProjects(projects1);
+      // Optionally set the first project as current if none is selected
+      if (!projectStore.currentProject && projects1.length > 0) {
+        projectStore.setCurrentProject(projects1[0]);
+      }
+    };
     getUserProjects();
-  });
+  },[projectStore]);
 
   const handleDeleteProject = async () => {
     if (projectToDelete) {
-      await getUserProjects();
+      await deleteProject(projectToDelete.id);
+      const leftProjects = await getProjects();
+      setProjects(leftProjects);
+      if (projectToDelete.id === projectStore.currentProject?.id) {
+        projectStore.setCurrentProject(leftProjects[0]);
+      }
       setProjectToDelete(null);
       onDeleteClose();
     }
   };
 
   const handleCreateProject = async () => {
-    if (newProjectName.trim() !== "") {
+    if (newProjectName.trim() !== "" && newProjectDesc.trim() !== "") {
+      await createProject(newProjectName, newProjectDesc);
+      setProjects(await getProjects());
+      setNewProjectDescription("");
       setNewProjectName("");
       onCreateClose();
     }
@@ -96,10 +104,10 @@ export function NavbarComponent() {
           <NavbarItem>
             <Dropdown>
               <DropdownTrigger>
-                <Button variant="light">
+                <Button variant="ghost">
                   {projectStore.currentProject
                     ? projectStore.currentProject.name
-                    : "Select Project"}
+                    : ""}
                 </Button>
               </DropdownTrigger>
               <DropdownMenu>
@@ -109,7 +117,6 @@ export function NavbarComponent() {
                       key={project.id}
                       title={project.name}
                       onPress={() => projectStore.setCurrentProject(project)}
-                      isSelected={project.id === projectStore.currentProject?.id}
                       endContent={
                         <Button isIconOnly onPress={() => {
                           setProjectToDelete(project);
