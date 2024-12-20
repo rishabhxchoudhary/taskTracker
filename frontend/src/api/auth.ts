@@ -3,7 +3,6 @@ import client from './client';
 
 export const googleLogin = async (payload: GoogleJWT) : Promise<User> => {
   const response = await client.post<User>('/user/googleLogin', payload);
-  console.log("response", response);
   return response.data;
 }
 

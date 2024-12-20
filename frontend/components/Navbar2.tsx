@@ -13,6 +13,7 @@ import {
 } from "@nextui-org/react";
 import { DatePicker } from "@nextui-org/react";
 import { getLocalTimeZone, today, CalendarDate } from "@internationalized/date";
+import React from "react";
 import { useAuthStore } from "../store/authStore";
 
 
@@ -27,7 +28,7 @@ function convertTimestampToCalendarDate(unixTimestamp) {
   return new CalendarDate(year, month, day);
 }
 export function NavbarComponent() {
-  const auth = useAuthStore((state)=> state);
+  const auth = useAuthStore((state)=> state)
   return (
     <Navbar>
       <NavbarBrand>
@@ -79,8 +80,8 @@ export function NavbarComponent() {
               </Dropdown>
             </>
           ) : (
-            <Button as={Link} color="primary" href="/login" variant="flat">
-              Log In
+            <Button as={Link} color="primary" href="/register" variant="flat">
+              Register
             </Button>
           )}
         </NavbarItem>

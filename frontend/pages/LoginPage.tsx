@@ -9,30 +9,28 @@ import {
   CardBody,
 } from "@nextui-org/react";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
-import { useAuth } from "../hooks/AuthContext";
+// import { useAuth } from "../hooks/AuthContext";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
-import Layout  from "../layouts/Layout";
+import Layout  from "../layouts/Layout2";
 import { GoogleJWT } from "../types/types";
 import { googleLogin } from "../src/api/auth";
-
+import { useAuthStore } from "../store/authStore";
 
 export default function Login() {
   const navigate = useNavigate();
-  const auth = useAuth();
+  const auth = useAuthStore((state)=> state)
 
   useEffect(() => {
     if (auth?.user) {
       navigate("/");
     }
-  }, [auth?.user, navigate]);
+  }, [auth.user,navigate]);
 
   const loginWithGoogle = async (response: CredentialResponse) => {
-    console.log(response);
     if (response.credential) {
       const decoded: GoogleJWT = jwtDecode(response.credential);
       const data = await googleLogin(decoded);
-      console.log("Data", data)
       auth?.login(data);
       navigate("/");
     }
