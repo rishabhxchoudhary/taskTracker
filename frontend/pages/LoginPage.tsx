@@ -16,6 +16,8 @@ import Layout  from "../layouts/Layout2";
 import { GoogleJWT } from "../types/types";
 import { googleLogin } from "../src/api/auth";
 import { useAuthStore } from "../store/authStore";
+import React from "react";
+import { toast } from "sonner";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -32,7 +34,11 @@ export default function Login() {
       const decoded: GoogleJWT = jwtDecode(response.credential);
       const data = await googleLogin(decoded);
       auth?.login(data);
-      navigate("/");
+      navigate("/project");
+      toast.success("Logged In Successfully");
+    } else {
+      console.log("Login Failed");
+      toast.error("Login Failed");
     }
   };
 

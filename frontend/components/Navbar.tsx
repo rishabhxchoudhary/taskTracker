@@ -102,6 +102,7 @@ export function NavbarComponent() {
         </NavbarBrand>
 
         <NavbarContent justify="end" className="flex items-center space-x-4">
+          {auth && auth.user && auth?.user?.created_at && (
           <NavbarItem>
             <Dropdown>
               <DropdownTrigger>
@@ -145,7 +146,7 @@ export function NavbarComponent() {
               </DropdownMenu>
             </Dropdown>
           </NavbarItem>
-
+        )}
           {auth && auth.user && auth?.user?.created_at && (
             <NavbarItem>
               <DatePicker

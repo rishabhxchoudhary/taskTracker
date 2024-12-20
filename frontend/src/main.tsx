@@ -9,6 +9,7 @@ import { AuthProvider } from "../hooks/AuthContext.tsx";
 import RequireAuth from "../layouts/RequireAuth.tsx";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import Home from '../pages/Home.tsx'
+import Project from '../pages/Project.tsx'
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -18,15 +19,16 @@ createRoot(document.getElementById("root")!).render(
           <BrowserRouter>
             <Routes>
               <Route
-                path="/"
+                path="/project"
                 element={
                   <RequireAuth>
-                      <Home />
+                      <Project />
                   </RequireAuth>
                 }
               />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/" element={<Home />} />
             </Routes>
           </BrowserRouter>
         </NextUIProvider>

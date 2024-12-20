@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { AuthState, User } from '../types/types';
 import { getCurrentUser, logoutUser } from '../src/api/auth';
+import { toast } from 'sonner';
 
 export const useAuthStore = create<AuthState>((set) => ({
     user: null,
@@ -10,9 +11,11 @@ export const useAuthStore = create<AuthState>((set) => ({
         try {
             await getCurrentUser(); // Assuming this sets the current user on the server
             set({ user: userData, status: 'authenticated' });
+            toast.success("Logged In Successfully");
         } catch (error) {
             set({ user: null, status: 'unauthenticated' });
             console.error('Login failed:', error);
+            toast.error("Login Failed");
         }
     },
     logout: async () => {
@@ -20,8 +23,10 @@ export const useAuthStore = create<AuthState>((set) => ({
         try {
             await logoutUser();
             set({ user: null, status: 'unauthenticated' });
+            toast.success("Logged Out Successfully");
         } catch (error) {
             console.error('Logout failed:', error);
+            toast.error("Logout Failed");
         }
     },
     refreshUser: async () => {
