@@ -4,7 +4,6 @@ import (
 	"backend/database"
 	"backend/models"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -73,14 +72,11 @@ func DeleteProject(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
-	fmt.Println("Delete Project")
 	var id ID
 	if err := json.NewDecoder(r.Body).Decode(&id); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	fmt.Println("Id", id)
-
 	if err := database.DeleteProject(id.ID); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
