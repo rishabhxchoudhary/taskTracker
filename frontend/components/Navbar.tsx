@@ -105,7 +105,7 @@ export function NavbarComponent() {
           <NavbarItem>
             <Dropdown>
               <DropdownTrigger>
-                <Button variant="ghost">
+                <Button variant="flat" color="success">
                   {projectStore.currentProject
                     ? projectStore.currentProject.name
                     : ""}
