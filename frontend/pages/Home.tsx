@@ -6,7 +6,7 @@ const Home = () => {
   const project = useProjectStore((state) => state.currentProject);
   return (
     <Layout>
-        <div>{project.id} {project.name}</div>
+        <div>{project?.id} {project?.name}</div>
     </Layout>
   )
 }
