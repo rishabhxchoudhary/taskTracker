@@ -27,6 +27,7 @@ export interface Project {
     id: string;
     name: string;
     description: string;
+    created_at: number;
 }
 
 export interface ProjectStore {

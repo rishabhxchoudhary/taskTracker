@@ -149,7 +149,7 @@ export function NavbarComponent() {
               <DatePicker
                 defaultValue={today(getLocalTimeZone())}
                 minValue={convertTimestampToCalendarDate(
-                  auth?.user?.created_at
+                  projectStore?.currentProject?.created_at
                 )}
                 maxValue={today(getLocalTimeZone())}
                 aria-label="Select a date"
