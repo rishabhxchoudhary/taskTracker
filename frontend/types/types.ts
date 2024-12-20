@@ -1,3 +1,5 @@
+import { CalendarDate } from "@nextui-org/react";
+
 export interface User {
     id: string;
     username: string;
@@ -27,6 +29,8 @@ export interface Project {
 }
 
 export interface ProjectStore {
-    project: Project | null ;
-    setProject: (project: Project) => void;
+    currentProject: Project | null ;
+    currentDate: CalendarDate;
+    setCurrentProject: (project: Project) => void;
+    setCurrentDate: (date: CalendarDate) => void;
 }

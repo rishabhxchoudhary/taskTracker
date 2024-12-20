@@ -10,13 +10,24 @@ import {
   DropdownTrigger,
   Dropdown,
   DropdownMenu,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Input,
+  useDisclosure,
+  DropdownSection,
 } from "@nextui-org/react";
+import { RiStickyNoteAddLine } from "react-icons/ri";
 import { DatePicker } from "@nextui-org/react";
 import { getLocalTimeZone, today, CalendarDate } from "@internationalized/date";
 import { useAuthStore } from "../store/authStore";
-import React, { useEffect } from "react";
+import { useProjectStore } from "../store/projectStore";
+import React, { useEffect, useState } from "react";
 import { getProjects } from "../src/api/project";
 import { Project } from "../types/types";
+import { MdDelete } from "react-icons/md";
 
 function convertTimestampToCalendarDate(unixTimestamp: number) {
   const date = new Date(unixTimestamp * 1000);
@@ -27,48 +38,116 @@ function convertTimestampToCalendarDate(unixTimestamp: number) {
 }
 
 export function NavbarComponent() {
-  const auth = useAuthStore((state)=> state);
-  const [projects, setProjects] = React.useState<Project[]>([]);
+  const auth = useAuthStore((state) => state);
+  const projectStore = useProjectStore((state) => state);
+  const [projects, setProjects] = useState<Project[]>([]);
+
+  const {
+    isOpen: isDeleteOpen,
+    onOpen: onDeleteOpen,
+    onOpenChange: onDeleteClose,
+  } = useDisclosure();
+  const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
+
+  const {
+    isOpen: isCreateOpen,
+    onOpen: onCreateOpen,
+    onOpenChange: onCreateClose,
+  } = useDisclosure();
+  const [newProjectName, setNewProjectName] = useState<string>("");
+  const [newProjectDesc, setNewProjectDescription] = useState<string>("");
 
   const getUserProjects = async () => {
-    const projects1: Project[] = await getProjects()
-    setProjects(projects1)
-  }
+    const projects1: Project[] = await getProjects();
+    setProjects(projects1);
+    // Optionally set the first project as current if none is selected
+    if (!projectStore.currentProject && projects1.length > 0) {
+      projectStore.setCurrentProject(projects1[0]);
+    }
+  };
 
-  useEffect(()=>{
-    getUserProjects()
-  },[])
+  useEffect(() => {
+    getUserProjects();
+  });
+
+  const handleDeleteProject = async () => {
+    if (projectToDelete) {
+      await getUserProjects();
+      setProjectToDelete(null);
+      onDeleteClose();
+    }
+  };
+
+  const handleCreateProject = async () => {
+    if (newProjectName.trim() !== "") {
+      setNewProjectName("");
+      onCreateClose();
+    }
+  };
 
   return (
-    <Navbar>
-      <NavbarBrand>
-        <p className="font-bold text-2xl">Task Tracker</p>
-      </NavbarBrand>
+    <>
+      <Navbar>
+        <NavbarBrand>
+          <p className="font-bold text-2xl">Task Tracker</p>
+        </NavbarBrand>
 
-      {projects.map((p)=>{
-        return (
+        <NavbarContent justify="end" className="flex items-center space-x-4">
           <NavbarItem>
-            <Link href={`/projects/${p.id}`}>
-              {p.name}
-            </Link>
-          </NavbarItem>
-        )
-      })}
+            <Dropdown>
+              <DropdownTrigger>
+                <Button variant="light">
+                  {projectStore.currentProject
+                    ? projectStore.currentProject.name
+                    : "Select Project"}
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu>
+                <DropdownSection showDivider={true} aria-label="projects">
+                  {projects.map((project: Project) => (
+                    <DropdownItem
+                      key={project.id}
+                      title={project.name}
+                      onPress={() => projectStore.setCurrentProject(project)}
+                      isSelected={project.id === projectStore.currentProject?.id}
+                      endContent={
+                        <Button isIconOnly onPress={() => {
+                          setProjectToDelete(project);
+                          onDeleteOpen()
+                          }}>
+                          <MdDelete className="w-4 h-4 " />
+                        </Button>
+                      }
+                    />
+                  ))}
+                </DropdownSection>
 
-      <NavbarContent justify="end">
-        {auth && auth.user && auth?.user?.created_at && (
-          <NavbarItem>
-            <DatePicker
-              defaultValue={today(getLocalTimeZone())}
-              label=""
-              minValue={convertTimestampToCalendarDate(auth?.user?.created_at)}
-              maxValue={today(getLocalTimeZone())}
-            />
+                <DropdownSection aria-label="create-new-project">
+                  <DropdownItem key="create-new" startContent={<RiStickyNoteAddLine/>} title="Create New Project" onPress={() => onCreateOpen()} />
+                </DropdownSection>
+              </DropdownMenu>
+            </Dropdown>
           </NavbarItem>
-        )}
-        <NavbarItem>
-          {auth && auth.user ? (
-            <>
+
+          {auth && auth.user && auth?.user?.created_at && (
+            <NavbarItem>
+              <DatePicker
+                defaultValue={today(getLocalTimeZone())}
+                minValue={convertTimestampToCalendarDate(
+                  auth?.user?.created_at
+                )}
+                maxValue={today(getLocalTimeZone())}
+                aria-label="Select a date"
+                onChange={(date) => {
+                  if (date) {
+                    projectStore.setCurrentDate(date as CalendarDate);
+                  }
+                }}
+              />
+            </NavbarItem>
+          )}
+          <NavbarItem>
+            {auth && auth.user ? (
               <Dropdown placement="bottom-end">
                 <DropdownTrigger>
                   <Avatar
@@ -98,14 +177,76 @@ export function NavbarComponent() {
                   </DropdownItem>
                 </DropdownMenu>
               </Dropdown>
+            ) : (
+              <Button as={Link} color="primary" href="/login" variant="flat">
+                Log In
+              </Button>
+            )}
+          </NavbarItem>
+        </NavbarContent>
+      </Navbar>
+
+      <Modal isOpen={isDeleteOpen} onOpenChange={onDeleteClose} closeButton>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader>Delete Project</ModalHeader>
+              <ModalBody>
+                <p>
+                  Are you sure you want to delete the project{" "}
+                  <strong>{projectToDelete?.name}</strong>? This action cannot
+                  be undone.
+                </p>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="primary" onPress={onClose}>
+                  Cancel
+                </Button>
+                <Button color="danger" onPress={handleDeleteProject}>
+                  Delete
+                </Button>
+              </ModalFooter>
             </>
-          ) : (
-            <Button as={Link} color="primary" href="/login" variant="flat">
-              Log In
-            </Button>
           )}
-        </NavbarItem>
-      </NavbarContent>
-    </Navbar>
+        </ModalContent>
+      </Modal>
+
+      <Modal isOpen={isCreateOpen} onOpenChange={onCreateClose} closeButton>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader>Create New Project</ModalHeader>
+              <ModalBody>
+                <Input
+                  label="Project Name"
+                  placeholder="Enter project name"
+                  value={newProjectName}
+                  onChange={(e) => setNewProjectName(e.target.value)}
+                  required={true}
+                />
+                <Input
+                  label="Project Description"
+                  placeholder="Enter project Description"
+                  value={newProjectDesc}
+                  onChange={(e) => setNewProjectDescription(e.target.value)}
+                />
+              </ModalBody>
+              <ModalFooter>
+                <Button color="primary" onPress={onClose}>
+                  Cancel
+                </Button>
+                <Button
+                  color="success"
+                  onPress={handleCreateProject}
+                  isDisabled={(newProjectName.trim() === "") || (newProjectDesc.trim() === "")}
+                >
+                  Create
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+    </>
   );
 }
