@@ -12,7 +12,7 @@ import (
 func NewRouter() *mux.Router {
 	r := mux.NewRouter()
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000"},
+		AllowedOrigins:   []string{"http://localhost:3000", "http://localhost:3001", "http://localhost:3002"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization"},
 		AllowCredentials: true,
@@ -40,6 +40,11 @@ func NewRouter() *mux.Router {
 	projectRouter.HandleFunc("", handlers.GetAllProjects).Methods("GET")
 	projectRouter.HandleFunc("", handlers.CreateProject).Methods("POST")
 	projectRouter.HandleFunc("/delete", handlers.DeleteProject).Methods("POST")
+
+	taskRouter := api.PathPrefix("/task").Subrouter()
+	taskRouter.HandleFunc("", handlers.GetAllTasks).Methods("POST")
+	taskRouter.HandleFunc("/create", handlers.CreateTask).Methods("POST")
+	// taskRouter.HandleFunc("/delete", handlers.DeleteTask).Methods("POST")
 
 	return r
 }

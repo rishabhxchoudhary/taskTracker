@@ -56,3 +56,7 @@ func GetUserCollection() *mongo.Collection {
 func GetProjectCollection() *mongo.Collection {
 	return Client.Database("yourdbname").Collection("projects")
 }
+
+func GetTaskCollection() *mongo.Collection {
+	return Client.Database("yourdbname").Collection("tasks")
+}

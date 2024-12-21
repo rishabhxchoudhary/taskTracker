@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Layout from "../layouts/Layout";
 import {
   Button,
@@ -17,74 +17,77 @@ import { RadioGroup, Radio } from "@nextui-org/react";
 import { TaskInterface } from "../types/types";
 import TaskCard from "../components/TaskCard";
 import AddTaskCard from "../components/AddTask";
+import { createTask, getTasks } from "../src/api/task";
+import { useProjectStore } from "../store/projectStore";
+import { toast } from "sonner";
+
+function getPriorityIndex(priority: string) {
+  switch (priority) {
+    case "low":
+      return 5;
+    case "medium":
+      return 4;
+    case "high":
+      return 3;
+    case "urgent":
+      return 2;
+    default:
+      return 1000;
+  }
+}
+
 
 const Project = () => {
-  const [tasks, setTasks] = React.useState<TaskInterface[]>([
-    {
-      id: 1,
-      title: "Sample Title 1",
-      description:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-      deadlineDate: null,
-      priority: "low",
-      status: 0,
-    },
-    {
-      id: 2,
-      title: "Sample Title 2",
-      description:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-      deadlineDate: null,
-      priority: "high",
-      status: 0,
-    },
-    {
-      id: 3,
-      title: "Sample Title 2",
-      description:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-      deadlineDate: null,
-      priority: "high",
-      status: 0,
-    },
-    {
-      id: 4,
-      title: "Sample Title 2",
-      description:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-      deadlineDate: null,
-      priority: "high",
-      status: 0,
-    },
-    {
-      id: 5,
-      title: "Sample Title 2",
-      description:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-      deadlineDate: null,
-      priority: "high",
-      status: 0,
-    },
-  ]);
-  const addTask = () => {
-    const newTask: TaskInterface = {
-      id: tasks.length + 1,
-      title: taskTitle,
-      description: taskDescription,
-      deadlineDate: taskDeadlineDate,
-      priority: taskPriority,
-      status: 0,
-    };
-    console.log("new task", newTask);
-    setTasks([...tasks, newTask]);
+  const project = useProjectStore((state) => state.currentProject);
+  const [tasks, setTasks] = React.useState<TaskInterface[]>([]);
+  useEffect(()=>{
+    const getData = async () => {
+      if (!project?.id) return;
+      const data = await getTasks(project.id);
+      data.sort((a, b) => {
+        return getPriorityIndex(a.priority) - getPriorityIndex(b.priority);
+      });
+      toast.success("Tasks Fetched Successfully");
+      console.log("data", data);
+      setTasks(data);
+    }
+    getData();
+  },[project?.id])
 
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  
+  const addTask = async () => {
+    if (!project) return;
+    let taskDeadlineDate2 = 0;
+    if (taskDeadlineDate) {
+      const utcDate = Date.UTC(
+        taskDeadlineDate.year,
+        taskDeadlineDate.month - 1,
+        taskDeadlineDate.day
+      );
+      taskDeadlineDate2 = Math.floor(utcDate / 1000);
+    }
+    await createTask(
+      taskTitle,
+      taskDescription,
+      project.id,
+      taskPriority,
+      taskDeadlineDate2
+    );
+    const data = await getTasks(project.id);
+    toast.success("Task Created Successfully");
+    // Sort them by priority, priority low, medium, high, urgent
+    data.sort((a, b) => {
+      return getPriorityIndex(a.priority) - getPriorityIndex(b.priority);
+    });
+    setTasks(data);
     onOpen();
     setTaskTitle("");
     setTaskDescription("");
     setTaskDeadlineDate(null);
     setTaskPriority("low");
   };
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  
   const [taskTitle, setTaskTitle] = React.useState("");
   const [taskDescription, setTaskDescription] = React.useState("");
   const [taskDeadlineDate, setTaskDeadlineDate] =
@@ -95,10 +98,14 @@ const Project = () => {
   return (
     <Layout>
       <div className="max-w-7xl mx-auto p-4">
-        <div className="grid gap-4 grid-cols-6" style={{
-          gridTemplateColumns: "repeat(5, minmax(0, 1fr))"
-        }}>
-          <AddTaskCard onAdd={onOpen} />
+        Project Id: {project?.id}
+        Project Name: {project?.name} 
+        <div
+          className="grid gap-4"
+          style={{
+            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+          }}
+        >
           {tasks.map((task) => (
             <TaskCard
               key={task.id}
@@ -107,9 +114,9 @@ const Project = () => {
               description={task.description}
               deadlineDate={task.deadlineDate}
               priority={task.priority}
-              status={task.status}
             />
           ))}
+          <AddTaskCard onAdd={onOpen} />
         </div>
       </div>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange} closeButton>
@@ -140,9 +147,20 @@ const Project = () => {
                   size="sm"
                   value={taskPriority}
                   onValueChange={(value: string) => {
-                    const validPriorities = ["low", "medium", "high", "urgent"] as const;
-                    if (validPriorities.includes(value as typeof validPriorities[number])) {
-                      setTaskPriority(value as "low" | "medium" | "high" | "urgent");
+                    const validPriorities = [
+                      "low",
+                      "medium",
+                      "high",
+                      "urgent",
+                    ] as const;
+                    if (
+                      validPriorities.includes(
+                        value as (typeof validPriorities)[number]
+                      )
+                    ) {
+                      setTaskPriority(
+                        value as "low" | "medium" | "high" | "urgent"
+                      );
                     } else {
                       console.warn(`Invalid priority value: ${value}`);
                     }

@@ -43,5 +43,4 @@ export interface TaskInterface {
     description: string;
     deadlineDate: CalendarDate | null;
     priority: "low" | "medium" | "high" | "urgent";
-    status: number
 }
