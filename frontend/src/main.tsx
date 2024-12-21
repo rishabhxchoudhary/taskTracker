@@ -10,6 +10,7 @@ import RequireAuth from "../layouts/RequireAuth.tsx";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import Home from '../pages/Home.tsx'
 import Project from '../pages/Project.tsx'
+import TaskPage from '../pages/TaskPage.tsx'
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -23,6 +24,14 @@ createRoot(document.getElementById("root")!).render(
                 element={
                   <RequireAuth>
                       <Project />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/task/:taskid"
+                element={
+                  <RequireAuth>
+                      <TaskPage />
                   </RequireAuth>
                 }
               />
