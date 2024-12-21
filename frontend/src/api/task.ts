@@ -1,7 +1,7 @@
-import { toast } from 'sonner';
 import { TaskInterface } from '../../types/types';
 import client from './client';
 import { CalendarDate } from '@internationalized/date';
+import { ExcalidrawElement } from '@excalidraw/excalidraw/types/element/types';
 
 interface TaskResponse extends TaskInterface {
     deadline_date: number
@@ -31,7 +31,6 @@ export const createTask = async (title: string, description: string, projectId: 
         deadlineDate,
         projectId
     });
-    toast.success("Task has been created");
     return 
 }
 
@@ -40,6 +39,17 @@ export const deleteProject = async (taskId: string, projectId: string): Promise<
         taskId,
         projectId
     });
-    toast.success("Task has been deleted");
+    return;
+}
+
+export const getBoardData = async (taskId: string): Promise<ExcalidrawElement[]> => {
+    const data = await client.get(`/task/board/${taskId}`);
+    return data.data || [];
+}
+
+export const setBoardData = async (taskId: string, elements: ExcalidrawElement[]): Promise<null> => {
+    await client.post(`/task/board/${taskId}`, {
+        board_data: JSON.stringify(elements)
+    });
     return;
 }
