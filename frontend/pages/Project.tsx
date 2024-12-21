@@ -20,6 +20,7 @@ import AddTaskCard from "../components/AddTask";
 import { createTask, getTasks } from "../src/api/task";
 import { useProjectStore } from "../store/projectStore";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 function getPriorityIndex(priority: string) {
   switch (priority) {
@@ -38,6 +39,7 @@ function getPriorityIndex(priority: string) {
 
 
 const Project = () => {
+  const navigate = useNavigate();
   const project = useProjectStore((state) => state.currentProject);
   const [tasks, setTasks] = React.useState<TaskInterface[]>([]);
   useEffect(()=>{
@@ -48,7 +50,6 @@ const Project = () => {
         return getPriorityIndex(a.priority) - getPriorityIndex(b.priority);
       });
       toast.success("Tasks Fetched Successfully");
-      console.log("data", data);
       setTasks(data);
     }
     getData();
@@ -107,14 +108,15 @@ const Project = () => {
           }}
         >
           {tasks.map((task) => (
+            <div key={task.id} onClick={() => navigate(`/task/${task.id}`)}>
             <TaskCard
-              key={task.id}
               id={task.id}
               title={task.title}
               description={task.description}
               deadlineDate={task.deadlineDate}
               priority={task.priority}
             />
+            </div>
           ))}
           <AddTaskCard onAdd={onOpen} />
         </div>
