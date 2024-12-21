@@ -12,7 +12,7 @@ import (
 func NewRouter() *mux.Router {
 	r := mux.NewRouter()
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000", "http://localhost:3001", "http://localhost:3002"},
+		AllowedOrigins:   []string{"http://localhost:3000", "http://localhost:3001", "http://localhost:3002", "https://tasks-tracker-rishabh.vercel.app"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization"},
 		AllowCredentials: true,
@@ -47,7 +47,6 @@ func NewRouter() *mux.Router {
 
 	taskRouter.HandleFunc("/board/{id}", handlers.GetBoardData).Methods("GET")
 	taskRouter.HandleFunc("/board/{id}", handlers.SetBoardData).Methods("POST")
-
 
 	return r
 }
