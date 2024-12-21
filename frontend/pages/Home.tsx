@@ -1,7 +1,18 @@
 // import React from 'react'
+import { useEffect } from 'react';
 import Layout2 from '../layouts/Layout'
+import { useAuthStore } from '../store/authStore'
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
+  const navigate = useNavigate();
+  const {user } = useAuthStore((state)=> state);
+  useEffect(()=>{
+    if (user) {
+      console.log("User is logged in")
+      navigate('/project');
+    }
+},[user, navigate])
   return (
     <Layout2>
       Welcome to Task Tracker APP.

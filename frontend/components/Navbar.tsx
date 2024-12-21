@@ -30,6 +30,7 @@ import { Project } from "../types/types";
 import { MdDelete } from "react-icons/md";
 import { Alert } from "@nextui-org/react";
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 function convertTimestampToCalendarDate(unixTimestamp: number) {
   const date = new Date(unixTimestamp * 1000);
@@ -40,6 +41,7 @@ function convertTimestampToCalendarDate(unixTimestamp: number) {
 }
 
 export function NavbarComponent() {
+  const navigate = useNavigate();
   const auth = useAuthStore((state) => state);
   const projectStore = useProjectStore((state) => state);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -98,7 +100,7 @@ export function NavbarComponent() {
     <>
       <Navbar>
         <NavbarBrand>
-          <p className="font-bold text-2xl">Task Tracker</p>
+          <p className="font-bold text-2xl cursor-pointer"> <a onClick={()=>{navigate("/")}}>Task Tracker</a> </p>
         </NavbarBrand>
 
         <NavbarContent justify="end" className="flex items-center space-x-4">
