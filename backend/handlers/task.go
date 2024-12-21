@@ -95,7 +95,11 @@ func GetBoardData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Get board data from database
-	boardData := database.GetBoardData(objID)
+	boardData, err := database.GetBoardData(objID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(boardData)
 }

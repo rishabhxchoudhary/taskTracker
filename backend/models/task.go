@@ -20,5 +20,5 @@ type Task struct {
 	Priority     Priority           `json:"priority" bson:"priority"`
 	DeadlineDate int64              `json:"deadline_date,omitempty" bson:"deadline_date,omitempty"`
 	CreatedAt    int64              `json:"created_at,omitempty" bson:"created_at,omitempty"`
-	BoardData    string          `json:"board_data,omitempty" bson:"board_data,omitempty"`
+	BoardData    []byte             `json:"board_data,omitempty" bson:"board_data,omitempty"`
 }
