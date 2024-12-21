@@ -39,6 +39,24 @@ func GetTaskByID(id string) (models.Task, error) {
 	return task, nil
 }
 
+func GetBoardData(id primitive.ObjectID) string {
+	var task models.Task
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	err := GetTaskCollection().FindOne(ctx, bson.M{"_id": id}).Decode(&task)
+	if err != nil {
+		return ""
+	}
+	return task.BoardData
+}
+
+func SetBoardData(id primitive.ObjectID, boardData string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	_, err := GetTaskCollection().UpdateOne(ctx, bson.M{"_id": id}, bson.M{"$set": bson.M{"board_data": boardData}})
+	return err
+}
+
 func CreateTask(task models.Task) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

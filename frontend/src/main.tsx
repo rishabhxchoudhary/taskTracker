@@ -28,7 +28,7 @@ createRoot(document.getElementById("root")!).render(
                 }
               />
               <Route
-                path="/task/:taskid"
+                path="/project/:taskid"
                 element={
                   <RequireAuth>
                       <TaskPage />

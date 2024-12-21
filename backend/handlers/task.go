@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -55,7 +56,6 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	fmt.Println("body", body)
 	task := models.Task{
 		ProjectID:    body.ProjectID,
 		OwnerID:      user.ID,
@@ -65,11 +65,71 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 		Priority:     body.Priority,
 		CreatedAt:    time.Now().Unix(),
 	}
-	fmt.Println("task", task)
 	if err := database.CreateTask(task); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	json.NewEncoder(w).Encode(task)
 
+}
+
+func GetBoardData(w http.ResponseWriter, r *http.Request) {
+	// JWT validation
+	_, err := GetUserFromJWT(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+	// Get task id from URL
+	vars := mux.Vars(r)
+	fmt.Println("vars", vars)
+	id, ok := vars["id"]
+	if !ok {
+		http.Error(w, "No task id provided", http.StatusBadRequest)
+		return
+	}
+	// convert id to ObjectID
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	// Get board data from database
+	boardData := database.GetBoardData(objID)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(boardData)
+}
+
+type setBoardBody struct {
+	BoardData string `json:"board_data"`
+}
+
+func SetBoardData(w http.ResponseWriter, r *http.Request) {
+	// JWT validation
+	_, err := GetUserFromJWT(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+	vars := mux.Vars(r)
+	id, ok := vars["id"]
+	if !ok {
+		http.Error(w, "No task id provided", http.StatusBadRequest)
+		return
+	}
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	var body setBoardBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	err = database.SetBoardData(objID, body.BoardData)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }

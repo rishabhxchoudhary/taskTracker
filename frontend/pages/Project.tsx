@@ -108,13 +108,14 @@ const Project = () => {
           }}
         >
           {tasks.map((task) => (
-            <div key={task.id} onClick={() => navigate(`/task/${task.id}`)}>
+            <div key={task.id} onClick={() => navigate(`/project/${task.id}`)}>
             <TaskCard
               id={task.id}
               title={task.title}
               description={task.description}
               deadlineDate={task.deadlineDate}
               priority={task.priority}
+              board_data={task.board_data}
             />
             </div>
           ))}

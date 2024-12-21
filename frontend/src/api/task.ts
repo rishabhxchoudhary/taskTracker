@@ -42,9 +42,9 @@ export const deleteProject = async (taskId: string, projectId: string): Promise<
     return;
 }
 
-export const getBoardData = async (taskId: string): Promise<ExcalidrawElement[]> => {
+export const getBoardData = async (taskId: string): Promise<string | null> => {
     const data = await client.get(`/task/board/${taskId}`);
-    return data.data || [];
+    return data.data;
 }
 
 export const setBoardData = async (taskId: string, elements: ExcalidrawElement[]): Promise<null> => {
