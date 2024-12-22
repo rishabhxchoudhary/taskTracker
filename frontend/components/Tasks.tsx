@@ -318,7 +318,7 @@ const Tasks = ({ tasks, project, setTasks }) => {
           <Input
             isClearable
             className="w-full sm:max-w-[44%]"
-            placeholder="Search by name..."
+            placeholder="Search by title..."
             startContent={<SearchIcon />}
             value={filterValue}
             onClear={() => onClear()}
