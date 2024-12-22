@@ -38,7 +38,7 @@ export interface ProjectStore {
 }
 
 export interface TaskInterface {
-    id: number;
+    id: string;
     title: string;
     description: string;
     deadlineDate: CalendarDate | null;

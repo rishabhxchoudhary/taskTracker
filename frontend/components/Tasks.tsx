@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import {
   Button,
   Chip,
@@ -36,6 +36,7 @@ import { SearchIcon } from "./SearchIcon";
 import { ChevronDownIcon } from "./ChevronDownIcon";
 import { PlusIcon } from "./PlusIcon";
 import { DeleteIcon } from "./DeleteIcon";
+import { TaskInterface } from "../types/types";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "title",
@@ -70,9 +71,18 @@ const Tasks = ({ tasks, project, setTasks }) => {
   const [taskPriority, setTaskPriority] = React.useState<
     "low" | "medium" | "high" | "urgent"
   >("low");
+  const [loading, setLoading] = React.useState(false);
+  const {
+      isOpen: isDeleteOpen,
+      onOpen: onDeleteOpen,
+      onOpenChange: onDeleteClose,
+    } = useDisclosure();
+    const [taskToDelete, setTaskToDelete] = React.useState<TaskInterface | null>(null);
+  
 
   const addTask = async () => {
     if (!project) return;
+    setLoading(true);
     let taskDeadlineDate2 = 0;
     if (taskDeadlineDate) {
       const utcDate = Date.UTC(
@@ -93,6 +103,7 @@ const Tasks = ({ tasks, project, setTasks }) => {
     toast.success("Task Created Successfully");
     setTasks(data);
     onOpen();
+    setLoading(false);
     setTaskTitle("");
     setTaskDescription("");
     setTaskDeadlineDate(null);
@@ -161,11 +172,16 @@ const Tasks = ({ tasks, project, setTasks }) => {
     });
   }, [sortDescriptor, items]);
 
-  async function updateTaskStatus(taskId, projectId, status) {
-    await updateStatus(taskId, projectId, status);
-    const data = await getTasks(projectId);
-    setTasks(data);
-  }
+  const updateTaskStatus = useCallback(
+    async (taskId, projectId, status) => {
+      setLoading(true);
+      await updateStatus(taskId, projectId, status);
+      const data = await getTasks(projectId);
+      setTasks(data);
+      setLoading(false);
+    },
+    [setTasks]
+  );
 
   const renderCell = React.useCallback(
     (task, columnKey) => {
@@ -251,11 +267,9 @@ const Tasks = ({ tasks, project, setTasks }) => {
               <Button
                 isIconOnly
                 color="default"
-                onPress={async () => {
-                  await deleteTask(task.id, project.id);
-                  const data = await getTasks(project.id);
-                  toast.success("Task Deleted Successfully");
-                  setTasks(data);
+                onPress={() => {
+                  setTaskToDelete(task);
+                  onDeleteOpen();
                 }}
                 className="text-lg text-danger cursor-pointer active:opacity-50"
               >
@@ -267,7 +281,7 @@ const Tasks = ({ tasks, project, setTasks }) => {
           return cellValue;
       }
     },
-    [navigate, project, setTasks]
+    [navigate, project, updateTaskStatus, onDeleteOpen]
   );
 
   const onSearchChange = React.useCallback((value) => {
@@ -448,6 +462,18 @@ const Tasks = ({ tasks, project, setTasks }) => {
     );
   }, [page, pages, onNextPage, onPreviousPage]);
 
+  const handlerTaskDelete = async () => {
+    if (!taskToDelete) return;
+    if (!project) return;
+    setLoading(true);
+    await deleteTask(taskToDelete.id, project.id);
+    const data = await getTasks(project.id);
+    toast.success("Task Deleted Successfully");
+    setTasks(data);
+    setLoading(false);
+    onDeleteClose();
+  }
+
   return (
     <>
       <div className="mt-2">
@@ -550,17 +576,43 @@ const Tasks = ({ tasks, project, setTasks }) => {
                 />
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" onPress={onClose}>
+                <Button color="danger" isDisabled={loading} onPress={onClose}>
                   Cancel
                 </Button>
                 <Button
                   color="success"
                   onPress={addTask}
+                  isLoading={loading}
                   isDisabled={
-                    taskTitle.trim() === "" || taskDescription.trim() === ""
+                    taskTitle.trim() === "" || taskDescription.trim() === "" || loading
                   }
                 >
                   Create
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
+      <Modal isOpen={isDeleteOpen} onOpenChange={onDeleteClose} closeButton>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader>Delete Task</ModalHeader>
+              <ModalBody>
+                <p>
+                  Are you sure you want to delete the task{" "}
+                  <strong>{taskToDelete?.title}</strong>? This action cannot
+                  be undone.
+                </p>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="primary" onPress={onClose}>
+                  Cancel
+                </Button>
+                <Button color="danger" isDisabled={loading} isLoading={loading} onPress={handlerTaskDelete}>
+                  Delete
                 </Button>
               </ModalFooter>
             </>
