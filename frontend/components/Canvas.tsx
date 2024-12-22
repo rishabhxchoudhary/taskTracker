@@ -13,7 +13,6 @@ const Canvas = ({ initialData }: { initialData: string }) => {
   const [whiteBoard, setWhiteBoard] = useState<
     readonly ExcalidrawElement[] | null
   >([]);
-  console.log("whiteBoard", whiteBoard);
 
   const saveData = useCallback(async () => {
     if (!taskId) return;

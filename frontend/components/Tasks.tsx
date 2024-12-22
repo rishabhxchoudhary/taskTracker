@@ -73,7 +73,6 @@ const statusOptions = [
 ];
 
 const Tasks = ({ tasks, project, setTasks }) => {
-  console.log("Tasks", tasks);
   const navigate = useNavigate();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [taskTitle, setTaskTitle] = React.useState("");
