@@ -1,25 +1,39 @@
 import React from "react";
-import TaskCard from "./TaskCard";
-import AddTaskCard from "./AddTask";
 import {
   Button,
+  Chip,
   DateInput,
   Divider,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
   Input,
   Modal,
   ModalBody,
   ModalContent,
   ModalFooter,
   ModalHeader,
+  Pagination,
   Radio,
   RadioGroup,
+  SortDescriptor,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
   useDisclosure,
 } from "@nextui-org/react";
-import { TaskInterface } from "../types/types";
 import { useNavigate } from "react-router-dom";
 import { CalendarDate, getLocalTimeZone, today } from "@internationalized/date";
 import { createTask, getTasks } from "../src/api/task";
 import { toast } from "sonner";
+import { SearchIcon } from "./SearchIcon";
+import { ChevronDownIcon } from "./ChevronDownIcon";
+import { PlusIcon } from "./PlusIcon";
+// import TaskTable from "./TaskTable";
 
 function getPriorityIndex(priority: string) {
   switch (priority) {
@@ -36,7 +50,30 @@ function getPriorityIndex(priority: string) {
   }
 }
 
+const INITIAL_VISIBLE_COLUMNS = [
+  "title",
+  "deadline_date",
+  "priority",
+  "status",
+  "created_at",
+];
+
+const columns = [
+  { name: "Title", uid: "title", sortable: true },
+  { name: "Deadline Date", uid: "deadline_date", sortable: true },
+  { name: "Priority", uid: "priority", sortable: true },
+  { name: "Status", uid: "status", sortable: true },
+  { name: "Created At", uid: "created_at", sortable: true },
+];
+
+const statusOptions = [
+  { name: "To Do", uid: "todo" },
+  { name: "In Progress", uid: "in_progress" },
+  { name: "Done", uid: "done" },
+];
+
 const Tasks = ({ tasks, project, setTasks }) => {
+  console.log("Tasks", tasks);
   const navigate = useNavigate();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [taskTitle, setTaskTitle] = React.useState("");
@@ -78,30 +115,293 @@ const Tasks = ({ tasks, project, setTasks }) => {
     setTaskDeadlineDate(null);
     setTaskPriority("low");
   };
+
+  const [filterValue, setFilterValue] = React.useState("");
+  const [visibleColumns] = React.useState<
+    Set<string> | string
+  >(new Set(INITIAL_VISIBLE_COLUMNS));
+  const [statusFilter] = React.useState("all");
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [sortDescriptor, setSortDescriptor] = React.useState<SortDescriptor>({
+    column: "priority",
+    direction: "descending",
+  });
+  const [page, setPage] = React.useState(1);
+
+  const hasSearchFilter = Boolean(filterValue);
+
+  const headerColumns = React.useMemo(() => {
+    if (visibleColumns === "all") return columns;
+
+    return columns.filter((column) =>
+      Array.from(visibleColumns).includes(column.uid)
+    );
+  }, [visibleColumns]);
+
+  const filteredItems = React.useMemo(() => {
+    let filteredTasks = [...tasks];
+
+    if (hasSearchFilter) {
+      filteredTasks = filteredTasks.filter((task) =>
+        task.title.toLowerCase().includes(filterValue.toLowerCase())
+      );
+    }
+
+    if (
+      statusFilter !== "all" &&
+      Array.from(statusFilter).length !== statusOptions.length
+    ) {
+      filteredTasks = filteredTasks.filter((task) =>
+        Array.from(statusFilter).includes(task.status)
+      );
+    }
+
+    return filteredTasks;
+  }, [tasks, filterValue, statusFilter, hasSearchFilter]);
+
+  const pages = Math.ceil(filteredItems.length / rowsPerPage);
+
+  const items = React.useMemo(() => {
+    const start = (page - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+
+    return filteredItems.slice(start, end);
+  }, [page, filteredItems, rowsPerPage]);
+
+  const sortedItems = React.useMemo(() => {
+    return [...items].sort((a, b) => {
+      const first = a[sortDescriptor.column];
+      const second = b[sortDescriptor.column];
+      const cmp = first < second ? -1 : first > second ? 1 : 0;
+
+      return sortDescriptor.direction === "descending" ? -cmp : cmp;
+    });
+  }, [sortDescriptor, items]);
+
+  const renderCell = React.useCallback((task, columnKey) => {
+    const cellValue = task[columnKey];
+
+    switch (columnKey) {
+      case "deadline_date":
+        if (cellValue) {
+          return new Date(cellValue * 1000).toLocaleDateString();
+        } else {
+          return "No Deadline";
+        }
+      case "priority":
+        if (cellValue === "low") {
+          return <Chip color="primary">Low</Chip>;
+        } else if (cellValue === "medium") {
+          return <Chip color="secondary">Medium</Chip>;
+        } else if (cellValue === "high") {
+          return <Chip color="warning">High</Chip>;
+        } else {
+          return <Chip color="danger">Upgent</Chip>;
+        }
+      case "created_at":
+        return new Date(cellValue * 1000).toLocaleDateString();
+      case "status":
+        if (cellValue){
+          return cellValue
+        } else {
+          return "To Do"
+        }
+      case "title":
+        return <div className="cursor-pointer" onClick={()=>{navigate(`/project/${task.id}`)}}> {cellValue}</div>
+      default:
+        return cellValue;
+    }
+  }, [navigate]);
+
+  const onSearchChange = React.useCallback((value) => {
+      if (value) {
+        setFilterValue(value);
+        setPage(1);
+      } else {
+        setFilterValue("");
+      }
+  }, []);
+
+  const onClear = React.useCallback(() => {
+    setFilterValue("");
+    setPage(1);
+  }, []);
+
+  function capitalize(s: string) {
+    return s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : "";
+  }
+
+  const onRowsPerPageChange = React.useCallback((e) => {
+      setRowsPerPage(Number(e.target.value));
+      setPage(1);
+    }, []);
   
+
+  const topContent = React.useMemo(() => {
+    return (
+      <div className="flex flex-col gap-4">
+        <div className="flex justify-between gap-3 items-end">
+          <Input
+            isClearable
+            className="w-full sm:max-w-[44%]"
+            placeholder="Search by title..."
+            startContent={<SearchIcon />}
+            value={filterValue}
+            onClear={() => onClear()}
+            onValueChange={onSearchChange}
+          />
+          <div className="flex gap-3">
+            <Dropdown>
+              <DropdownTrigger className="hidden sm:flex">
+                <Button
+                  endContent={<ChevronDownIcon className="text-small" />}
+                  variant="flat"
+                >
+                  Status
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                aria-label="Table Columns"
+                closeOnSelect={false}
+                selectedKeys={statusFilter}
+              >
+                {statusOptions.map((status) => (
+                  <DropdownItem key={status.uid} className="capitalize">
+                    {capitalize(status.name)}
+                  </DropdownItem>
+                ))}
+              </DropdownMenu>
+            </Dropdown>
+            <Dropdown>
+              <DropdownTrigger className="hidden sm:flex">
+                <Button
+                  endContent={<ChevronDownIcon className="text-small" />}
+                  variant="flat"
+                >
+                  Columns
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                disallowEmptySelection
+                aria-label="Table Columns"
+                closeOnSelect={false}
+                selectedKeys={visibleColumns}
+                selectionMode="multiple"
+              >
+                {columns.map((column) => (
+                  <DropdownItem key={column.uid} className="capitalize">
+                    {capitalize(column.name)}
+                  </DropdownItem>
+                ))}
+              </DropdownMenu>
+            </Dropdown>
+            <Button color="success" onPress={onOpen} endContent={<PlusIcon />}>
+              Add New
+            </Button>
+          </div>
+        </div>
+        <div className="flex justify-between items-center">
+          <span className="text-default-400 text-small">
+            Total {tasks.length} Tasks
+          </span>
+          <label className="flex items-center text-default-400 text-small">
+            Rows per page:
+            <select
+              className="bg-transparent outline-none text-default-400 text-small"
+              onChange={onRowsPerPageChange}
+            >
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+            </select>
+          </label>
+        </div>
+      </div>
+    );
+  }, [
+    onOpen,
+    onClear,
+    tasks.length,
+    filterValue,
+    statusFilter,
+    visibleColumns,
+    onRowsPerPageChange,
+    onSearchChange
+  ]);
+
+  const onNextPage = React.useCallback(() => {
+      if (page < pages) {
+        setPage(page + 1);
+      }
+    }, [page, pages]);
+  
+    const onPreviousPage = React.useCallback(() => {
+      if (page > 1) {
+        setPage(page - 1);
+      }
+    }, [page]);
+
+  const bottomContent = React.useMemo(() => {
+    return (
+      <div className="py-2 px-2 flex justify-between items-center">
+        <Pagination
+          isCompact
+          showControls
+          showShadow
+          color="primary"
+          page={page}
+          total={pages}
+          onChange={setPage}
+        />
+        <div className="hidden sm:flex w-[30%] justify-end gap-2">
+          <Button isDisabled={pages === 1} size="sm" variant="flat" onPress={onPreviousPage}>
+            Previous
+          </Button>
+          <Button isDisabled={pages === 1} size="sm" variant="flat" onPress={onNextPage}>
+            Next
+          </Button>
+        </div>
+      </div>
+    );
+  }, [page, pages, onNextPage, onPreviousPage]);
+
   return (
     <>
-      <div className="">
-        <div
-          className="grid gap-4"
-          style={{
-            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+      <div className="mt-2">
+        <Table
+          isHeaderSticky
+          aria-label="Tasks Table"
+          bottomContent={bottomContent}
+          bottomContentPlacement="outside"
+          classNames={{
+            wrapper: "max-h-[382px]",
           }}
+          sortDescriptor={sortDescriptor}
+          topContent={topContent}
+          topContentPlacement="outside"
+          onSortChange={setSortDescriptor}
         >
-          {tasks.map((task: TaskInterface) => (
-            <div key={task.id} onClick={() => navigate(`/project/${task.id}`)}>
-              <TaskCard
-                id={task.id}
-                title={task.title}
-                description={task.description}
-                deadlineDate={task.deadlineDate}
-                priority={task.priority}
-                board_data={task.board_data}
-              />
-            </div>
-          ))}
-          <AddTaskCard onAdd={onOpen} />
-        </div>
+          <TableHeader columns={headerColumns}>
+            {(column) => (
+              <TableColumn
+                key={column.uid}
+                align={"start"}
+                allowsSorting={column.sortable}
+              >
+                {column.name}
+              </TableColumn>
+            )}
+          </TableHeader>
+          <TableBody emptyContent={"No users found"} items={sortedItems}>
+            {(item) => (
+              <TableRow key={item.id}>
+                {(columnKey) => (
+                  <TableCell >{renderCell(item, columnKey)}</TableCell>
+                )}
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
       </div>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange} closeButton>
         <ModalContent>

@@ -43,8 +43,8 @@ const Project = () => {
 
   const tabs = [
     {
-      id: "tasks",
-      label: "Tasks",
+      id: "list",
+      label: "List",
       content: <Tasks project={project} tasks={tasks} setTasks={setTasks} />,
     },
     {
