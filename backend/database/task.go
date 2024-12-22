@@ -104,13 +104,21 @@ func UpdateTask(id string, task models.Task) error {
 	return err
 }
 
-func DeleteTask(id string) error {
-	objID, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return err
-	}
+func DeleteTask(taskID primitive.ObjectID, projectID primitive.ObjectID ) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	_, err = GetTaskCollection().DeleteOne(ctx, bson.M{"_id": objID})
+	_, err := GetTaskCollection().DeleteOne(ctx, bson.M{"_id": taskID, "project_id": projectID})
+	return err
+}
+
+func UpdateStatus(taskID primitive.ObjectID, projectID primitive.ObjectID, status models.TaskStatus) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	update := bson.M{
+		"$set": bson.M{
+			"status": status,
+		},
+	}
+	_, err := GetTaskCollection().UpdateOne(ctx, bson.M{"_id": taskID, "project_id": projectID}, update)
 	return err
 }

@@ -43,6 +43,7 @@ type CreateTaskBody struct {
 	Description string             `json:"description"`
 	Deadline    int64              `json:"deadlineDate"`
 	Priority    models.Priority    `json:"priority"`
+	Status      models.TaskStatus  `json:"status"`
 }
 
 func CreateTask(w http.ResponseWriter, r *http.Request) {
@@ -64,6 +65,7 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 		DeadlineDate: body.Deadline,
 		Priority:     body.Priority,
 		CreatedAt:    time.Now().Unix(),
+		Status:       body.Status,
 	}
 	if err := database.CreateTask(task); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -132,6 +134,56 @@ func SetBoardData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	err = database.SetBoardData(objID, body.BoardData)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+type DeleteTaskBody struct {
+	TaskID    primitive.ObjectID `json:"taskId"`
+	ProjectID primitive.ObjectID `json:"projectId"`
+}
+
+func DeleteTask(w http.ResponseWriter, r *http.Request) {
+	// JWT validation
+	_, err := GetUserFromJWT(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	var body DeleteTaskBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	err = database.DeleteTask(body.TaskID, body.ProjectID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+type UpdateStatusBody struct {
+	TaskID    primitive.ObjectID `json:"taskId"`
+	ProjectID primitive.ObjectID `json:"projectId"`
+	Status    models.TaskStatus  `json:"status"`
+}
+
+func UpdateStatus(w http.ResponseWriter, r *http.Request) {
+	// JWT validation
+	_, err := GetUserFromJWT(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+	var body UpdateStatusBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	err = database.UpdateStatus(body.TaskID, body.ProjectID, body.Status)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

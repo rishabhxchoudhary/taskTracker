@@ -9,32 +9,13 @@ import {Tabs, Tab } from "@nextui-org/react";
 import KanbanBoard from "../components/KanbanBoard";
 import PomodoroTimer from "../components/PomodoroTimer";
 
-function getPriorityIndex(priority: string) {
-  switch (priority) {
-    case "low":
-      return 5;
-    case "medium":
-      return 4;
-    case "high":
-      return 3;
-    case "urgent":
-      return 2;
-    default:
-      return 1000;
-  }
-}
-
 const Project = () => {
-  
   const project = useProjectStore((state) => state.currentProject);
   const [tasks, setTasks] = React.useState<TaskInterface[]>([]);
   useEffect(()=>{
     const getData = async () => {
       if (!project?.id) return;
       const data = await getTasks(project.id);
-      data.sort((a, b) => {
-        return getPriorityIndex(a.priority) - getPriorityIndex(b.priority);
-      });
       toast.success("Tasks Fetched Successfully");
       setTasks(data);
     }

@@ -29,15 +29,25 @@ export const createTask = async (title: string, description: string, projectId: 
         description,
         priority,
         deadlineDate,
-        projectId
+        projectId,
+        status: "to_do"
     });
     return 
 }
 
-export const deleteProject = async (taskId: string, projectId: string): Promise<null>  => {
+export const deleteTask = async (taskId: string, projectId: string): Promise<null>  => {
     await client.post(`/task/delete`,{
         taskId,
         projectId
+    });
+    return;
+}
+
+export const updateStatus = async (taskId: string, projectId: string, status: string): Promise<null>  => {
+    await client.post(`/task/update_status`,{
+        taskId,
+        projectId,
+        status
     });
     return;
 }

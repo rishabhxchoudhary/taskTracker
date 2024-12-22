@@ -30,28 +30,12 @@ import {
 } from "@nextui-org/react";
 import { useNavigate } from "react-router-dom";
 import { CalendarDate, getLocalTimeZone, today } from "@internationalized/date";
-import { createTask, getTasks } from "../src/api/task";
+import { createTask, deleteTask, getTasks, updateStatus } from "../src/api/task";
 import { toast } from "sonner";
 import { SearchIcon } from "./SearchIcon";
 import { ChevronDownIcon } from "./ChevronDownIcon";
 import { PlusIcon } from "./PlusIcon";
 import { DeleteIcon } from "./DeleteIcon";
-// import TaskTable from "./TaskTable";
-
-function getPriorityIndex(priority: string) {
-  switch (priority) {
-    case "low":
-      return 5;
-    case "medium":
-      return 4;
-    case "high":
-      return 3;
-    case "urgent":
-      return 2;
-    default:
-      return 1000;
-  }
-}
 
 const INITIAL_VISIBLE_COLUMNS = [
   "title",
@@ -107,10 +91,6 @@ const Tasks = ({ tasks, project, setTasks }) => {
     );
     const data = await getTasks(project.id);
     toast.success("Task Created Successfully");
-    // Sort them by priority, priority low, medium, high, urgent
-    data.sort((a, b) => {
-      return getPriorityIndex(a.priority) - getPriorityIndex(b.priority);
-    });
     setTasks(data);
     onOpen();
     setTaskTitle("");
@@ -121,8 +101,8 @@ const Tasks = ({ tasks, project, setTasks }) => {
 
   const [filterValue, setFilterValue] = React.useState("");
   const [visibleColumns, setVisibleColumns] = React.useState<Selection>(
-      new Set(INITIAL_VISIBLE_COLUMNS),
-    );
+    new Set(INITIAL_VISIBLE_COLUMNS)
+  );
   const [statusFilter, setStatusFilter] = React.useState<Selection>("all");
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [sortDescriptor, setSortDescriptor] = React.useState<SortDescriptor>({
@@ -181,6 +161,12 @@ const Tasks = ({ tasks, project, setTasks }) => {
     });
   }, [sortDescriptor, items]);
 
+  async function updateTaskStatus(taskId, projectId, status) {
+    await updateStatus(taskId, projectId, status);
+    const data = await getTasks(projectId);
+    setTasks(data);
+  }
+
   const renderCell = React.useCallback(
     (task, columnKey) => {
       const cellValue = task[columnKey];
@@ -221,23 +207,23 @@ const Tasks = ({ tasks, project, setTasks }) => {
               <DropdownMenu>
                 <DropdownItem
                   onPress={() => {
-                    task.status = "to_do";
+                    updateTaskStatus(task.id, project.id, "to_do");
                   }}
                   key="to_do"
                 >
                   To Do
                 </DropdownItem>
                 <DropdownItem
-                  onPress={() => {
-                    task.status = "in_progress";
+                  onPress={ () => {
+                    updateTaskStatus(task.id, project.id, "in_progress");
                   }}
                   key="in_progress"
                 >
                   In Progress
                 </DropdownItem>
                 <DropdownItem
-                  onPress={() => {
-                    task.status = "done";
+                  onPress={ () => {
+                    updateTaskStatus(task.id, project.id, "done");
                   }}
                   key="done"
                 >
@@ -259,19 +245,29 @@ const Tasks = ({ tasks, project, setTasks }) => {
             </div>
           );
         case "action":
-          case "actions":
-        return (
+        case "actions":
+          return (
             <Tooltip color="danger" content="Delete Task">
-              <span className="text-lg text-danger cursor-pointer active:opacity-50">
+              <Button
+                isIconOnly
+                color="default"
+                onPress={async () => {
+                  await deleteTask(task.id, project.id);
+                  const data = await getTasks(project.id);
+                  toast.success("Task Deleted Successfully");
+                  setTasks(data);
+                }}
+                className="text-lg text-danger cursor-pointer active:opacity-50"
+              >
                 <DeleteIcon />
-              </span>
+              </Button>
             </Tooltip>
-        )
+          );
         default:
           return cellValue;
       }
     },
-    [navigate]
+    [navigate, project, setTasks]
   );
 
   const onSearchChange = React.useCallback((value) => {
@@ -298,18 +294,18 @@ const Tasks = ({ tasks, project, setTasks }) => {
   }, []);
 
   const classNames = React.useMemo(
-      () => ({
-        th: ["bg-transparent", "text-default-500", "border-b", "border-divider"],
-        td: [
-          "group-data-[first=true]/tr:first:before:rounded-none",
-          "group-data-[first=true]/tr:last:before:rounded-none",
-          "group-data-[middle=true]/tr:before:rounded-none",
-          "group-data-[last=true]/tr:first:before:rounded-none",
-          "group-data-[last=true]/tr:last:before:rounded-none",
-        ],
-      }),
-      [],
-    );
+    () => ({
+      th: ["bg-transparent", "text-default-500", "border-b", "border-divider"],
+      td: [
+        "group-data-[first=true]/tr:first:before:rounded-none",
+        "group-data-[first=true]/tr:last:before:rounded-none",
+        "group-data-[middle=true]/tr:before:rounded-none",
+        "group-data-[last=true]/tr:first:before:rounded-none",
+        "group-data-[last=true]/tr:last:before:rounded-none",
+      ],
+    }),
+    []
+  );
 
   const topContent = React.useMemo(() => {
     return (
@@ -325,10 +321,12 @@ const Tasks = ({ tasks, project, setTasks }) => {
             onValueChange={onSearchChange}
           />
           <div className="flex gap-3">
-
             <Dropdown>
               <DropdownTrigger className="sm:flex">
-                <Button endContent={<ChevronDownIcon className="text-small" />} variant="flat">
+                <Button
+                  endContent={<ChevronDownIcon className="text-small" />}
+                  variant="flat"
+                >
                   Status
                 </Button>
               </DropdownTrigger>
@@ -349,7 +347,10 @@ const Tasks = ({ tasks, project, setTasks }) => {
             </Dropdown>
             <Dropdown>
               <DropdownTrigger className="sm:flex">
-                <Button endContent={<ChevronDownIcon className="text-small" />} variant="flat">
+                <Button
+                  endContent={<ChevronDownIcon className="text-small" />}
+                  variant="flat"
+                >
                   Columns
                 </Button>
               </DropdownTrigger>
@@ -368,13 +369,15 @@ const Tasks = ({ tasks, project, setTasks }) => {
                 ))}
               </DropdownMenu>
             </Dropdown>
-            <Button color="success" endContent={<PlusIcon />}>
+            <Button onPress={onOpen} color="success" endContent={<PlusIcon />}>
               Add New
             </Button>
           </div>
         </div>
         <div className="flex justify-between items-center">
-          <span className="text-default-400 text-small">Total {tasks.length} tasks</span>
+          <span className="text-default-400 text-small">
+            Total {tasks.length} tasks
+          </span>
           <label className="flex items-center text-default-400 text-small">
             Rows per page:
             <select
@@ -391,12 +394,13 @@ const Tasks = ({ tasks, project, setTasks }) => {
     );
   }, [
     onClear,
+    onOpen,
     filterValue,
     statusFilter,
     visibleColumns,
     onRowsPerPageChange,
     onSearchChange,
-    tasks.length
+    tasks.length,
   ]);
   const onNextPage = React.useCallback(() => {
     if (page < pages) {

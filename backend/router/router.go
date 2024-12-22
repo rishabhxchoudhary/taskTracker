@@ -44,6 +44,8 @@ func NewRouter() *mux.Router {
 	taskRouter := api.PathPrefix("/task").Subrouter()
 	taskRouter.HandleFunc("", handlers.GetAllTasks).Methods("POST")
 	taskRouter.HandleFunc("/create", handlers.CreateTask).Methods("POST")
+	taskRouter.HandleFunc("/delete", handlers.DeleteTask).Methods("POST")
+	taskRouter.HandleFunc("/update_status", handlers.UpdateStatus).Methods("POST")
 
 	taskRouter.HandleFunc("/board/{id}", handlers.GetBoardData).Methods("GET")
 	taskRouter.HandleFunc("/board/{id}", handlers.SetBoardData).Methods("POST")

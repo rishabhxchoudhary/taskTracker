@@ -11,6 +11,14 @@ const (
 	PriorityUrgent Priority = "urgent"
 )
 
+type TaskStatus string
+
+const (
+	StatusTodo       TaskStatus = "to_do"
+	StatusInProgress TaskStatus = "in_progress"
+	StatusDone       TaskStatus = "done"
+)
+
 type Task struct {
 	ID           primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
 	ProjectID    primitive.ObjectID `json:"project_id" bson:"project_id"` // Reference to Project ID
@@ -21,4 +29,5 @@ type Task struct {
 	DeadlineDate int64              `json:"deadline_date,omitempty" bson:"deadline_date,omitempty"`
 	CreatedAt    int64              `json:"created_at,omitempty" bson:"created_at,omitempty"`
 	BoardData    []byte             `json:"board_data,omitempty" bson:"board_data,omitempty"`
+	Status       TaskStatus         `json:"status,omitempty" bson:"status,omitempty"`
 }

@@ -1,0 +1,14 @@
+export function getPriorityIndex(priority: string) {
+  switch (priority) {
+    case "low":
+      return 5;
+    case "medium":
+      return 4;
+    case "high":
+      return 3;
+    case "urgent":
+      return 2;
+    default:
+      return 1000;
+  }
+}
