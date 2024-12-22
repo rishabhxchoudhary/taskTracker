@@ -56,7 +56,7 @@ const columns = [
 ];
 
 const statusOptions = [
-  { name: "To Do", uid: "todo" },
+  { name: "To Do", uid: "to_do" },
   { name: "In Progress", uid: "in_progress" },
   { name: "Done", uid: "done" },
 ];
@@ -210,7 +210,7 @@ const Tasks = ({ tasks, project, setTasks }) => {
           return (
             <Dropdown>
               <DropdownTrigger>
-                <Button radius="full" size="sm" variant="ghost">
+                <Button radius="full" color={cellValue=="to_do" ? "danger" : cellValue == "in_progress" ? "warning" : "success"} size="sm" variant="faded">
                   {cellValue
                     ? cellValue == "to_do"
                       ? "To Do"
@@ -250,13 +250,7 @@ const Tasks = ({ tasks, project, setTasks }) => {
           );
         case "title":
           return (
-            <div
-              className="cursor-pointer"
-              onClick={() => {
-                navigate(`/project/${task.id}`);
-              }}
-            >
-              {" "}
+            <div>
               {cellValue}
             </div>
           );
@@ -281,7 +275,7 @@ const Tasks = ({ tasks, project, setTasks }) => {
           return cellValue;
       }
     },
-    [navigate, project, updateTaskStatus, onDeleteOpen]
+    [project, updateTaskStatus, onDeleteOpen]
   );
 
   const onSearchChange = React.useCallback((value) => {
@@ -478,6 +472,7 @@ const Tasks = ({ tasks, project, setTasks }) => {
     <>
       <div className="mt-2">
         <Table
+          selectionMode="single"
           isHeaderSticky
           aria-label="Tasks Table"
           bottomContent={bottomContent}
@@ -501,7 +496,7 @@ const Tasks = ({ tasks, project, setTasks }) => {
           </TableHeader>
           <TableBody emptyContent={"No Tasks found"} items={sortedItems}>
             {(item) => (
-              <TableRow key={item.id}>
+              <TableRow className="cursor-pointer" onClick={()=>{navigate(`/project/${item.id}`)}} key={item.id}>
                 {(columnKey) => (
                   <>
                     <TableCell>{renderCell(item, columnKey)}</TableCell>
