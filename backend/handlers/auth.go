@@ -57,8 +57,8 @@ func GoogleLogin(w http.ResponseWriter, r *http.Request) {
 		Value:    token,
 		Expires:  time.Now().Add(72 * time.Hour), // Match the token expiration
 		HttpOnly: true,                           // Prevents JavaScript access
-		Secure:   false,                          // Ensure it's only sent over HTTPS
-		SameSite: http.SameSite(0),               // Adjust based on your requirements
+		Secure:   true,                           // Ensure it's only sent over HTTPS
+		SameSite: http.SameSite(1),               // Adjust based on your requirements
 		Path:     "/",                            // Cookie is valid for the entire site
 	})
 
@@ -116,8 +116,8 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 		Expires:  time.Unix(0, 0),  // Set expiration to the Unix epoch
 		MaxAge:   -1,               // Instructs the browser to delete the cookie immediately
 		HttpOnly: true,             // Prevents JavaScript access to the cookie
-		Secure:   false,            // Set to true in production to ensure HTTPS transmission
-		SameSite: http.SameSite(0), // Adjust based on your security requirements
+		Secure:   true,             // Set to true in production to ensure HTTPS transmission
+		SameSite: http.SameSite(1), // Adjust based on your security requirements
 	})
 
 	w.WriteHeader(http.StatusOK)
