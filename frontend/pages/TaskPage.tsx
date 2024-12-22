@@ -22,14 +22,14 @@ const TaskPage = () => {
 
   if (loading) {
     return <Layout>
-      <Skeleton style={{height: "93vh", width: "100%"}} />
+      <Skeleton style={{height: "100vh", width: "100%"}} />
     </Layout>;
   }
   
   return (
-    <Layout>
+    // <Layout>
       <Canvas initialData={initialData} />
-    </Layout>
+    // </Layout>
   );
 };
 
