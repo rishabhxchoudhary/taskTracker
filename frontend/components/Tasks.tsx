@@ -17,6 +17,7 @@ import {
   Pagination,
   Radio,
   RadioGroup,
+  Selection,
   SortDescriptor,
   Table,
   TableBody,
@@ -24,6 +25,7 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
+  Tooltip,
   useDisclosure,
 } from "@nextui-org/react";
 import { useNavigate } from "react-router-dom";
@@ -33,6 +35,7 @@ import { toast } from "sonner";
 import { SearchIcon } from "./SearchIcon";
 import { ChevronDownIcon } from "./ChevronDownIcon";
 import { PlusIcon } from "./PlusIcon";
+import { DeleteIcon } from "./DeleteIcon";
 // import TaskTable from "./TaskTable";
 
 function getPriorityIndex(priority: string) {
@@ -55,7 +58,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   "deadline_date",
   "priority",
   "status",
-  "created_at",
+  "action",
 ];
 
 const columns = [
@@ -64,6 +67,7 @@ const columns = [
   { name: "Priority", uid: "priority", sortable: true },
   { name: "Status", uid: "status", sortable: true },
   { name: "Created At", uid: "created_at", sortable: true },
+  { name: "Action", uid: "action" },
 ];
 
 const statusOptions = [
@@ -116,10 +120,10 @@ const Tasks = ({ tasks, project, setTasks }) => {
   };
 
   const [filterValue, setFilterValue] = React.useState("");
-  const [visibleColumns] = React.useState<
-    Set<string> | string
-  >(new Set(INITIAL_VISIBLE_COLUMNS));
-  const [statusFilter] = React.useState("all");
+  const [visibleColumns, setVisibleColumns] = React.useState<Selection>(
+      new Set(INITIAL_VISIBLE_COLUMNS),
+    );
+  const [statusFilter, setStatusFilter] = React.useState<Selection>("all");
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [sortDescriptor, setSortDescriptor] = React.useState<SortDescriptor>({
     column: "priority",
@@ -177,48 +181,106 @@ const Tasks = ({ tasks, project, setTasks }) => {
     });
   }, [sortDescriptor, items]);
 
-  const renderCell = React.useCallback((task, columnKey) => {
-    const cellValue = task[columnKey];
+  const renderCell = React.useCallback(
+    (task, columnKey) => {
+      const cellValue = task[columnKey];
 
-    switch (columnKey) {
-      case "deadline_date":
-        if (cellValue) {
+      switch (columnKey) {
+        case "deadline_date":
+          if (cellValue) {
+            return new Date(cellValue * 1000).toLocaleDateString();
+          } else {
+            return "No Deadline";
+          }
+        case "priority":
+          if (cellValue === "low") {
+            return <Chip color="primary">Low</Chip>;
+          } else if (cellValue === "medium") {
+            return <Chip color="secondary">Medium</Chip>;
+          } else if (cellValue === "high") {
+            return <Chip color="warning">High</Chip>;
+          } else {
+            return <Chip color="danger">Urgent</Chip>;
+          }
+        case "created_at":
           return new Date(cellValue * 1000).toLocaleDateString();
-        } else {
-          return "No Deadline";
-        }
-      case "priority":
-        if (cellValue === "low") {
-          return <Chip color="primary">Low</Chip>;
-        } else if (cellValue === "medium") {
-          return <Chip color="secondary">Medium</Chip>;
-        } else if (cellValue === "high") {
-          return <Chip color="warning">High</Chip>;
-        } else {
-          return <Chip color="danger">Upgent</Chip>;
-        }
-      case "created_at":
-        return new Date(cellValue * 1000).toLocaleDateString();
-      case "status":
-        if (cellValue){
-          return cellValue
-        } else {
-          return "To Do"
-        }
-      case "title":
-        return <div className="cursor-pointer" onClick={()=>{navigate(`/project/${task.id}`)}}> {cellValue}</div>
-      default:
-        return cellValue;
-    }
-  }, [navigate]);
+        case "status":
+          return (
+            <Dropdown>
+              <DropdownTrigger>
+                <Button radius="full" size="sm" variant="ghost">
+                  {cellValue
+                    ? cellValue == "to_do"
+                      ? "To Do"
+                      : cellValue == "in_progress"
+                      ? "In Progress"
+                      : "Done"
+                    : "To Do"}
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu>
+                <DropdownItem
+                  onPress={() => {
+                    task.status = "to_do";
+                  }}
+                  key="to_do"
+                >
+                  To Do
+                </DropdownItem>
+                <DropdownItem
+                  onPress={() => {
+                    task.status = "in_progress";
+                  }}
+                  key="in_progress"
+                >
+                  In Progress
+                </DropdownItem>
+                <DropdownItem
+                  onPress={() => {
+                    task.status = "done";
+                  }}
+                  key="done"
+                >
+                  Done
+                </DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
+          );
+        case "title":
+          return (
+            <div
+              className="cursor-pointer"
+              onClick={() => {
+                navigate(`/project/${task.id}`);
+              }}
+            >
+              {" "}
+              {cellValue}
+            </div>
+          );
+        case "action":
+          case "actions":
+        return (
+            <Tooltip color="danger" content="Delete Task">
+              <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                <DeleteIcon />
+              </span>
+            </Tooltip>
+        )
+        default:
+          return cellValue;
+      }
+    },
+    [navigate]
+  );
 
   const onSearchChange = React.useCallback((value) => {
-      if (value) {
-        setFilterValue(value);
-        setPage(1);
-      } else {
-        setFilterValue("");
-      }
+    if (value) {
+      setFilterValue(value);
+      setPage(1);
+    } else {
+      setFilterValue("");
+    }
   }, []);
 
   const onClear = React.useCallback(() => {
@@ -231,10 +293,23 @@ const Tasks = ({ tasks, project, setTasks }) => {
   }
 
   const onRowsPerPageChange = React.useCallback((e) => {
-      setRowsPerPage(Number(e.target.value));
-      setPage(1);
-    }, []);
-  
+    setRowsPerPage(Number(e.target.value));
+    setPage(1);
+  }, []);
+
+  const classNames = React.useMemo(
+      () => ({
+        th: ["bg-transparent", "text-default-500", "border-b", "border-divider"],
+        td: [
+          "group-data-[first=true]/tr:first:before:rounded-none",
+          "group-data-[first=true]/tr:last:before:rounded-none",
+          "group-data-[middle=true]/tr:before:rounded-none",
+          "group-data-[last=true]/tr:first:before:rounded-none",
+          "group-data-[last=true]/tr:last:before:rounded-none",
+        ],
+      }),
+      [],
+    );
 
   const topContent = React.useMemo(() => {
     return (
@@ -243,26 +318,27 @@ const Tasks = ({ tasks, project, setTasks }) => {
           <Input
             isClearable
             className="w-full sm:max-w-[44%]"
-            placeholder="Search by title..."
+            placeholder="Search by name..."
             startContent={<SearchIcon />}
             value={filterValue}
             onClear={() => onClear()}
             onValueChange={onSearchChange}
           />
           <div className="flex gap-3">
+
             <Dropdown>
-              <DropdownTrigger className="hidden sm:flex">
-                <Button
-                  endContent={<ChevronDownIcon className="text-small" />}
-                  variant="flat"
-                >
+              <DropdownTrigger className="sm:flex">
+                <Button endContent={<ChevronDownIcon className="text-small" />} variant="flat">
                   Status
                 </Button>
               </DropdownTrigger>
               <DropdownMenu
+                disallowEmptySelection
                 aria-label="Table Columns"
                 closeOnSelect={false}
                 selectedKeys={statusFilter}
+                selectionMode="multiple"
+                onSelectionChange={setStatusFilter}
               >
                 {statusOptions.map((status) => (
                   <DropdownItem key={status.uid} className="capitalize">
@@ -272,11 +348,8 @@ const Tasks = ({ tasks, project, setTasks }) => {
               </DropdownMenu>
             </Dropdown>
             <Dropdown>
-              <DropdownTrigger className="hidden sm:flex">
-                <Button
-                  endContent={<ChevronDownIcon className="text-small" />}
-                  variant="flat"
-                >
+              <DropdownTrigger className="sm:flex">
+                <Button endContent={<ChevronDownIcon className="text-small" />} variant="flat">
                   Columns
                 </Button>
               </DropdownTrigger>
@@ -286,6 +359,7 @@ const Tasks = ({ tasks, project, setTasks }) => {
                 closeOnSelect={false}
                 selectedKeys={visibleColumns}
                 selectionMode="multiple"
+                onSelectionChange={setVisibleColumns}
               >
                 {columns.map((column) => (
                   <DropdownItem key={column.uid} className="capitalize">
@@ -294,15 +368,13 @@ const Tasks = ({ tasks, project, setTasks }) => {
                 ))}
               </DropdownMenu>
             </Dropdown>
-            <Button color="success" onPress={onOpen} endContent={<PlusIcon />}>
+            <Button color="primary" endContent={<PlusIcon />}>
               Add New
             </Button>
           </div>
         </div>
         <div className="flex justify-between items-center">
-          <span className="text-default-400 text-small">
-            Total {tasks.length} Tasks
-          </span>
+          <span className="text-default-400 text-small">Total {tasks.length} tasks</span>
           <label className="flex items-center text-default-400 text-small">
             Rows per page:
             <select
@@ -318,27 +390,25 @@ const Tasks = ({ tasks, project, setTasks }) => {
       </div>
     );
   }, [
-    onOpen,
     onClear,
-    tasks.length,
     filterValue,
     statusFilter,
     visibleColumns,
     onRowsPerPageChange,
-    onSearchChange
+    onSearchChange,
+    tasks.length
   ]);
-
   const onNextPage = React.useCallback(() => {
-      if (page < pages) {
-        setPage(page + 1);
-      }
-    }, [page, pages]);
-  
-    const onPreviousPage = React.useCallback(() => {
-      if (page > 1) {
-        setPage(page - 1);
-      }
-    }, [page]);
+    if (page < pages) {
+      setPage(page + 1);
+    }
+  }, [page, pages]);
+
+  const onPreviousPage = React.useCallback(() => {
+    if (page > 1) {
+      setPage(page - 1);
+    }
+  }, [page]);
 
   const bottomContent = React.useMemo(() => {
     return (
@@ -353,10 +423,20 @@ const Tasks = ({ tasks, project, setTasks }) => {
           onChange={setPage}
         />
         <div className="hidden sm:flex w-[30%] justify-end gap-2">
-          <Button isDisabled={pages === 1} size="sm" variant="flat" onPress={onPreviousPage}>
+          <Button
+            isDisabled={pages === 1}
+            size="sm"
+            variant="flat"
+            onPress={onPreviousPage}
+          >
             Previous
           </Button>
-          <Button isDisabled={pages === 1} size="sm" variant="flat" onPress={onNextPage}>
+          <Button
+            isDisabled={pages === 1}
+            size="sm"
+            variant="flat"
+            onPress={onNextPage}
+          >
             Next
           </Button>
         </div>
@@ -372,9 +452,7 @@ const Tasks = ({ tasks, project, setTasks }) => {
           aria-label="Tasks Table"
           bottomContent={bottomContent}
           bottomContentPlacement="outside"
-          classNames={{
-            wrapper: "max-h-[382px]",
-          }}
+          classNames={classNames}
           sortDescriptor={sortDescriptor}
           topContent={topContent}
           topContentPlacement="outside"
@@ -395,7 +473,9 @@ const Tasks = ({ tasks, project, setTasks }) => {
             {(item) => (
               <TableRow key={item.id}>
                 {(columnKey) => (
-                  <TableCell >{renderCell(item, columnKey)}</TableCell>
+                  <>
+                    <TableCell>{renderCell(item, columnKey)}</TableCell>
+                  </>
                 )}
               </TableRow>
             )}
