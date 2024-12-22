@@ -80,8 +80,8 @@ const Tasks = ({ tasks, project, setTasks }) => {
   };
   
   return (
-    <div>
-      <div className="max-w-7xl mx-auto p-4">
+    <>
+      <div className="">
         <div
           className="grid gap-4"
           style={{
@@ -184,7 +184,7 @@ const Tasks = ({ tasks, project, setTasks }) => {
           )}
         </ModalContent>
       </Modal>
-    </div>
+    </>
   );
 };
 
