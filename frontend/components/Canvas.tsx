@@ -61,7 +61,7 @@ const Canvas = ({ initialData }: { initialData: string }) => {
   }, [handleKeyDown]);
 
   return (
-    <div style={{ height: "93vh", position: "relative" }}>
+    <div style={{ height: "100vh", position: "relative" }}>
       <Excalidraw
         theme="dark"
         initialData={
