@@ -368,7 +368,7 @@ const Tasks = ({ tasks, project, setTasks }) => {
                 ))}
               </DropdownMenu>
             </Dropdown>
-            <Button color="primary" endContent={<PlusIcon />}>
+            <Button color="success" endContent={<PlusIcon />}>
               Add New
             </Button>
           </div>
