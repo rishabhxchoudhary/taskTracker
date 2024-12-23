@@ -6,7 +6,7 @@ import { useProjectStore } from "../store/projectStore";
 import { toast } from "sonner";
 import Tasks from "../components/Tasks";
 import {Tabs, Tab } from "@nextui-org/react";
-import KanbanBoard from "../components/KanbanBoard";
+import KanbanBoard from "../components/kanbanboard/KanbanBoard";
 import PomodoroTimer from "../components/PomodoroTimer";
 
 const Project = () => {
@@ -31,7 +31,7 @@ const Project = () => {
     {
       id: "kanban",
       label: "Kanban Board",
-      content: <KanbanBoard />,
+      content: <KanbanBoard tasks={tasks} />,
     },
     {
       id: "pomodoro",
