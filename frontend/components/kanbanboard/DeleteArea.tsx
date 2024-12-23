@@ -1,3 +1,5 @@
+// DeleteArea.tsx
+
 import React from 'react';
 import { Droppable } from '@hello-pangea/dnd';
 import clsx from 'clsx';
@@ -7,14 +9,16 @@ const DeleteArea: React.FC = () => {
         <Droppable droppableId="delete">
             {(provided, snapshot) => (
                 <div
-                    className={clsx(
-                        "fixed bottom-0 left-0 right-0 h-16 flex items-center justify-center transition-colors",
-                        snapshot.isDraggingOver ? "bg-red-600" : "bg-gray-800"
-                    )}
                     ref={provided.innerRef}
                     {...provided.droppableProps}
+                    className={clsx(
+                        "flex items-center justify-center",
+                        "h-20",
+                        "border-2 border-dashed border-red-500",
+                        snapshot.isDraggingOver ? "bg-red-100" : "bg-white"
+                    )}
                 >
-                    <p className="text-white text-lg">Drag here to delete</p>
+                    <span className="text-red-500 font-semibold">Drag here to delete</span>
                     {provided.placeholder}
                 </div>
             )}

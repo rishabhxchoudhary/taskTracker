@@ -1,3 +1,5 @@
+// Column.tsx
+
 import React from 'react';
 import { DroppableProvided } from '@hello-pangea/dnd';
 import clsx from 'clsx';
@@ -13,7 +15,6 @@ interface ColumnProps {
 }
 
 const Column: React.FC<ColumnProps> = ({ title, tasks, provided, isDraggingOver }) => {
-    // console.log("provided", provided);
     return (
         <div
             className="flex flex-col flex-1 min-w-[300px]"
