@@ -555,8 +555,6 @@ const Tasks = ({ tasks, project, setTasks }) => {
                   placeholder="Enter Task Description"
                   value={taskDescription}
                   onChange={(e) => setTaskDescription(e.target.value)}
-                  required={true}
-                  isRequired={true}
                 />
                 <Divider />
                 <RadioGroup
@@ -609,7 +607,6 @@ const Tasks = ({ tasks, project, setTasks }) => {
                   isLoading={loading}
                   isDisabled={
                     taskTitle.trim() === "" ||
-                    taskDescription.trim() === "" ||
                     loading
                   }
                 >

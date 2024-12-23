@@ -45,7 +45,7 @@ export function NavbarComponent() {
   const auth = useAuthStore((state) => state);
   const projectStore = useProjectStore((state) => state);
   const [projects, setProjects] = useState<Project[]>([]);
-
+  const [loading, setLoading] = useState(false);
   const {
     isOpen: isDeleteOpen,
     onOpen: onDeleteOpen,
@@ -75,6 +75,7 @@ export function NavbarComponent() {
 
   const handleDeleteProject = async () => {
     if (projectToDelete) {
+      setLoading(true);
       await deleteProject(projectToDelete.id);
       const leftProjects = await getProjects();
       setProjects(leftProjects);
@@ -82,17 +83,20 @@ export function NavbarComponent() {
         projectStore.setCurrentProject(leftProjects[0]);
       }
       setProjectToDelete(null);
+      setLoading(false);
       onDeleteClose();
     }
   };
 
   const handleCreateProject = async () => {
-    if (newProjectName.trim() !== "" && newProjectDesc.trim() !== "") {
+    if (newProjectName.trim() !== "" ) {
+      setLoading(true);
       await createProject(newProjectName, newProjectDesc);
       setProjects(await getProjects());
       setNewProjectDescription("");
       setNewProjectName("");
       onCreateClose();
+      setLoading(false);
     }
   };
 
@@ -121,7 +125,7 @@ export function NavbarComponent() {
                       // className=""
                       key={project.id}
                       title={project.name}
-                      description={project.description.length > 50 ? project.description.slice(0, 50) + "..." : project.description}
+                      description={project.description?.length > 50 ? project.description?.slice(0, 50) + "..." : project.description}
                       onPress={() => projectStore.setCurrentProject(project)}
                       endContent={
                         <Button
@@ -232,7 +236,7 @@ export function NavbarComponent() {
                 <Button color="primary" onPress={onClose}>
                   Cancel
                 </Button>
-                <Button color="danger" onPress={handleDeleteProject}>
+                <Button isLoading={loading} color="danger" onPress={handleDeleteProject}>
                   Delete
                 </Button>
               </ModalFooter>
@@ -252,7 +256,7 @@ export function NavbarComponent() {
                   placeholder="Enter project name"
                   value={newProjectName}
                   onChange={(e) => setNewProjectName(e.target.value)}
-                  required={true}
+                  isRequired={true}
                 />
                 <Input
                   label="Project Description"
@@ -268,8 +272,9 @@ export function NavbarComponent() {
                 <Button
                   color="success"
                   onPress={handleCreateProject}
+                  isLoading={loading}
                   isDisabled={
-                    newProjectName.trim() === "" || newProjectDesc.trim() === ""
+                    newProjectName.trim() === ""
                   }
                 >
                   Create
