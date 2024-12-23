@@ -30,13 +30,19 @@ import {
 } from "@nextui-org/react";
 import { useNavigate } from "react-router-dom";
 import { CalendarDate, getLocalTimeZone, today } from "@internationalized/date";
-import { createTask, deleteTask, getTasks, updateStatus } from "../src/api/task";
+import {
+  createTask,
+  deleteTask,
+  getTasks,
+  updateStatus,
+} from "../src/api/task";
 import { toast } from "sonner";
 import { SearchIcon } from "./SearchIcon";
 import { ChevronDownIcon } from "./ChevronDownIcon";
 import { PlusIcon } from "./PlusIcon";
 import { DeleteIcon } from "./DeleteIcon";
 import { TaskInterface } from "../types/types";
+import { EditIcon } from "./EditIcon";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "title",
@@ -52,7 +58,7 @@ const columns = [
   { name: "Priority", uid: "priority", sortable: true },
   { name: "Status", uid: "status", sortable: true },
   { name: "Created At", uid: "created_at", sortable: true },
-  { name: "Action", uid: "action" },
+  { name: "Actions", uid: "action" },
 ];
 
 const statusOptions = [
@@ -73,12 +79,21 @@ const Tasks = ({ tasks, project, setTasks }) => {
   >("low");
   const [loading, setLoading] = React.useState(false);
   const {
-      isOpen: isDeleteOpen,
-      onOpen: onDeleteOpen,
-      onOpenChange: onDeleteClose,
-    } = useDisclosure();
-    const [taskToDelete, setTaskToDelete] = React.useState<TaskInterface | null>(null);
-  
+    isOpen: isDeleteOpen,
+    onOpen: onDeleteOpen,
+    onOpenChange: onDeleteClose,
+  } = useDisclosure();
+  const [taskToDelete, setTaskToDelete] = React.useState<TaskInterface | null>(
+    null
+  );
+  const {
+    isOpen: isEditOpen,
+    onOpen: onEditOpen,
+    onOpenChange: onEditOpenChange,
+  } = useDisclosure();
+  const [taskToEdit, setTaskToEdit] = React.useState<TaskInterface | null>(
+    null
+  );
 
   const addTask = async () => {
     if (!project) return;
@@ -178,6 +193,10 @@ const Tasks = ({ tasks, project, setTasks }) => {
       await updateStatus(taskId, projectId, status);
       const data = await getTasks(projectId);
       setTasks(data);
+      setTaskToEdit((prev) => {
+        if (!prev) return null;
+        return { ...prev, status };
+      })
       setLoading(false);
     },
     [setTasks]
@@ -195,87 +214,84 @@ const Tasks = ({ tasks, project, setTasks }) => {
             return "No Deadline";
           }
         case "priority":
-          if (cellValue === "low") {
-            return <Chip color="primary">Low</Chip>;
-          } else if (cellValue === "medium") {
-            return <Chip color="secondary">Medium</Chip>;
-          } else if (cellValue === "high") {
-            return <Chip color="warning">High</Chip>;
-          } else {
-            return <Chip color="danger">Urgent</Chip>;
-          }
+          return (
+            <Chip
+              color={
+                cellValue == "low"
+                  ? "success"
+                  : cellValue == "medium"
+                  ? "primary"
+                  : cellValue == "high"
+                  ? "warning"
+                  : "danger"
+              }
+              size="sm"
+              variant="flat"
+            >
+              {cellValue}
+            </Chip>
+          );
         case "created_at":
           return new Date(cellValue * 1000).toLocaleDateString();
         case "status":
           return (
-            <Dropdown>
-              <DropdownTrigger>
-                <Button radius="full" color={cellValue=="to_do" ? "danger" : cellValue == "in_progress" ? "warning" : "success"} size="sm" variant="faded">
-                  {cellValue
-                    ? cellValue == "to_do"
-                      ? "To Do"
-                      : cellValue == "in_progress"
-                      ? "In Progress"
-                      : "Done"
-                    : "To Do"}
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu>
-                <DropdownItem
-                  onPress={() => {
-                    updateTaskStatus(task.id, project.id, "to_do");
-                  }}
-                  key="to_do"
-                >
-                  To Do
-                </DropdownItem>
-                <DropdownItem
-                  onPress={ () => {
-                    updateTaskStatus(task.id, project.id, "in_progress");
-                  }}
-                  key="in_progress"
-                >
-                  In Progress
-                </DropdownItem>
-                <DropdownItem
-                  onPress={ () => {
-                    updateTaskStatus(task.id, project.id, "done");
-                  }}
-                  key="done"
-                >
-                  Done
-                </DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
+            <Chip
+              color={
+                cellValue == "to_do"
+                  ? "danger"
+                  : cellValue == "in_progress"
+                  ? "warning"
+                  : "success"
+              }
+              size="sm"
+              variant="flat"
+            >
+              {cellValue
+                ? cellValue == "to_do"
+                  ? "To Do"
+                  : cellValue == "in_progress"
+                  ? "In Progress"
+                  : "Done"
+                : "To Do"}
+            </Chip>
           );
         case "title":
-          return (
-            <div>
-              {cellValue}
-            </div>
-          );
+          return <div>{cellValue}</div>;
         case "action":
         case "actions":
           return (
-            <Tooltip color="danger" content="Delete Task">
-              <Button
-                isIconOnly
-                color="default"
-                onPress={() => {
-                  setTaskToDelete(task);
-                  onDeleteOpen();
-                }}
-                className="text-lg text-danger cursor-pointer active:opacity-50"
-              >
-                <DeleteIcon />
-              </Button>
-            </Tooltip>
+            <div className="relative flex items-center gap-2">
+              <Tooltip content="Edit Task">
+                <Button
+                  onPress={() => {
+                    setTaskToEdit(task);
+                    onEditOpen();
+                  }}
+                  isIconOnly
+                  className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                >
+                  <EditIcon />
+                </Button>
+              </Tooltip>
+              <Tooltip color="danger" content="Delete Task">
+                <Button
+                  isIconOnly
+                  onPress={() => {
+                    setTaskToDelete(task);
+                    onDeleteOpen();
+                  }}
+                  className="text-lg text-danger cursor-pointer active:opacity-50"
+                >
+                  <DeleteIcon />
+                </Button>
+              </Tooltip>
+            </div>
           );
         default:
           return cellValue;
       }
     },
-    [project, updateTaskStatus, onDeleteOpen]
+    [onDeleteOpen]
   );
 
   const onSearchChange = React.useCallback((value) => {
@@ -466,7 +482,7 @@ const Tasks = ({ tasks, project, setTasks }) => {
     setTasks(data);
     setLoading(false);
     onDeleteClose();
-  }
+  };
 
   return (
     <>
@@ -496,7 +512,13 @@ const Tasks = ({ tasks, project, setTasks }) => {
           </TableHeader>
           <TableBody emptyContent={"No Tasks found"} items={sortedItems}>
             {(item) => (
-              <TableRow className="cursor-pointer" onClick={()=>{navigate(`/project/${item.id}`)}} key={item.id}>
+              <TableRow
+                className="cursor-pointer"
+                onClick={() => {
+                  navigate(`/project/${item.id}`);
+                }}
+                key={item.id}
+              >
                 {(columnKey) => (
                   <>
                     <TableCell>{renderCell(item, columnKey)}</TableCell>
@@ -579,7 +601,9 @@ const Tasks = ({ tasks, project, setTasks }) => {
                   onPress={addTask}
                   isLoading={loading}
                   isDisabled={
-                    taskTitle.trim() === "" || taskDescription.trim() === "" || loading
+                    taskTitle.trim() === "" ||
+                    taskDescription.trim() === "" ||
+                    loading
                   }
                 >
                   Create
@@ -598,18 +622,151 @@ const Tasks = ({ tasks, project, setTasks }) => {
               <ModalBody>
                 <p>
                   Are you sure you want to delete the task{" "}
-                  <strong>{taskToDelete?.title}</strong>? This action cannot
-                  be undone.
+                  <strong>{taskToDelete?.title}</strong>? This action cannot be
+                  undone.
                 </p>
               </ModalBody>
               <ModalFooter>
                 <Button color="primary" onPress={onClose}>
                   Cancel
                 </Button>
-                <Button color="danger" isDisabled={loading} isLoading={loading} onPress={handlerTaskDelete}>
+                <Button
+                  color="danger"
+                  isDisabled={loading}
+                  isLoading={loading}
+                  onPress={handlerTaskDelete}
+                >
                   Delete
                 </Button>
               </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
+      <Modal isOpen={isEditOpen} onOpenChange={onEditOpenChange} closeButton>
+        <ModalContent>
+          {() => (
+            <>
+              <ModalHeader>Edit Task</ModalHeader>
+              <ModalBody>
+                <Input
+                  label="Task Title"
+                  placeholder="Enter Task Title"
+                  value={taskToEdit?.title}
+                  onChange={(e) => setTaskTitle(e.target.value)}
+                  required={true}
+                  isRequired={true}
+                  isReadOnly
+                />
+                <Input
+                  label="Task Description"
+                  placeholder="Enter Task Description"
+                  value={taskToEdit?.description}
+                  onChange={(e) => setTaskDescription(e.target.value)}
+                  required={true}
+                  isRequired={true}
+                  isReadOnly
+                />
+                <Divider />
+                <RadioGroup
+                  color="success"
+                  size="sm"
+                  isReadOnly
+                  value={taskToEdit?.priority}
+                  onValueChange={(value: string) => {
+                    const validPriorities = [
+                      "low",
+                      "medium",
+                      "high",
+                      "urgent",
+                    ] as const;
+                    if (
+                      validPriorities.includes(
+                        value as (typeof validPriorities)[number]
+                      )
+                    ) {
+                      setTaskPriority(
+                        value as "low" | "medium" | "high" | "urgent"
+                      );
+                    } else {
+                      console.warn(`Invalid priority value: ${value}`);
+                    }
+                  }}
+                  label="Set the priority of this task"
+                  orientation="horizontal"
+                >
+                  <Radio value="urgent">Urgent</Radio>
+                  <Radio value="high">High</Radio>
+                  <Radio value="medium">Medium</Radio>
+                  <Radio value="low">Low</Radio>
+                </RadioGroup>
+                <Divider />
+                <DateInput
+                  size="sm"
+                  value={taskDeadlineDate}
+                  onChange={(e) => setTaskDeadlineDate(e)}
+                  label="Deadline Date"
+                  isReadOnly
+                  minValue={today(getLocalTimeZone())}
+                />
+                <Divider />
+
+                <Dropdown>
+                  <DropdownTrigger>
+                    <Button
+                      radius="full"
+                      color={
+                        taskToEdit.status == "to_do"
+                          ? "danger"
+                          : taskToEdit.status == "in_progress"
+                          ? "warning"
+                          : "success"
+                      }
+                      size="sm"
+                      variant="faded"
+                    >
+                      {taskToEdit.status
+                        ? taskToEdit.status == "to_do"
+                          ? "To Do"
+                          : taskToEdit.status == "in_progress"
+                          ? "In Progress"
+                          : "Done"
+                        : "To Do"}
+                    </Button>
+                  </DropdownTrigger>
+                  <DropdownMenu>
+                    <DropdownItem
+                      onPress={() => {
+                        updateTaskStatus(taskToEdit.id, project.id, "to_do");
+                      }}
+                      key="to_do"
+                    >
+                      To Do
+                    </DropdownItem>
+                    <DropdownItem
+                      onPress={() => {
+                        updateTaskStatus(
+                          taskToEdit.id,
+                          project.id,
+                          "in_progress"
+                        );
+                      }}
+                      key="in_progress"
+                    >
+                      In Progress
+                    </DropdownItem>
+                    <DropdownItem
+                      onPress={() => {
+                        updateTaskStatus(taskToEdit.id, project.id, "done");
+                      }}
+                      key="done"
+                    >
+                      Done
+                    </DropdownItem>
+                  </DropdownMenu>
+                </Dropdown>
+              </ModalBody>
             </>
           )}
         </ModalContent>

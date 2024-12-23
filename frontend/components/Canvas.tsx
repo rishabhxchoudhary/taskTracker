@@ -61,7 +61,7 @@ const Canvas = ({ initialData }: { initialData: string }) => {
   }, [handleKeyDown]);
 
   return (
-    <div style={{ height: "100vh", position: "relative" }}>
+    <div style={{ height: "93vh", position: "relative" }}>
       <Excalidraw
         theme="dark"
         initialData={
@@ -84,10 +84,13 @@ const Canvas = ({ initialData }: { initialData: string }) => {
         }}
       >
         <MainMenu>
-          <MainMenu.DefaultItems.SaveAsImage />
+          {/* <MainMenu.DefaultItems.SaveAsImage /> */}
           <MainMenu.DefaultItems.ClearCanvas />
           <MainMenu.DefaultItems.Help />
           <MainMenu.DefaultItems.ChangeCanvasBackground />
+          <MainMenu.ItemCustom>
+            <div>Custom Item</div>
+        </MainMenu.ItemCustom>
         </MainMenu>
         <WelcomeScreen>
           <WelcomeScreen.Hints.MenuHint />

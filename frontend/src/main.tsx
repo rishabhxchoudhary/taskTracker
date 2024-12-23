@@ -8,9 +8,9 @@ import Register from "../pages/RegisterPage.tsx";
 import { AuthProvider } from "../hooks/AuthContext.tsx";
 import RequireAuth from "../layouts/RequireAuth.tsx";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-import Home from '../pages/Home.tsx'
-import Project from '../pages/Project.tsx'
-import TaskPage from '../pages/TaskPage.tsx'
+import Home from "../pages/Home.tsx";
+import Project from "../pages/Project.tsx";
+import TaskPage from "../pages/TaskPage.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -23,7 +23,7 @@ createRoot(document.getElementById("root")!).render(
                 path="/project"
                 element={
                   <RequireAuth>
-                      <Project />
+                    <Project />
                   </RequireAuth>
                 }
               />
@@ -31,13 +31,14 @@ createRoot(document.getElementById("root")!).render(
                 path="/project/:taskid"
                 element={
                   <RequireAuth>
-                      <TaskPage />
+                    <TaskPage />
                   </RequireAuth>
                 }
               />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<Register />} />
               <Route path="/" element={<Home />} />
+              {/* <Route path="/board/:taskid" element={<Board />} /> */}
             </Routes>
           </BrowserRouter>
         </NextUIProvider>

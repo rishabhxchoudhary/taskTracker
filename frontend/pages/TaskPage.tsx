@@ -27,9 +27,9 @@ const TaskPage = () => {
   }
   
   return (
-    // <Layout>
+    <Layout>
       <Canvas initialData={initialData} />
-    // </Layout>
+    </Layout>
   );
 };
 
