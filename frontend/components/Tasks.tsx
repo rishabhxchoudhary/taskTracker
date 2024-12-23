@@ -114,9 +114,22 @@ const Tasks = ({ tasks, project, setTasks }) => {
       taskPriority,
       taskDeadlineDate2
     );
+    // Return the tasks from the server instead of adding the task locally
+    // setTasks((prev) => [
+    //   ...prev,
+    //   {
+    //     id: Math.random().toString(),
+    //     title: taskTitle,
+    //     description: taskDescription,
+    //     priority: taskPriority,
+    //     deadline_date: taskDeadlineDate2,
+    //     status: "to_do",
+    //     created_at: Math.floor(Date.now() / 1000),
+    //   },
+    // ]);
     const data = await getTasks(project.id);
-    toast.success("Task Created Successfully");
     setTasks(data);
+    toast.success("Task Created Successfully");
     onOpen();
     setLoading(false);
     setTaskTitle("");
@@ -191,8 +204,14 @@ const Tasks = ({ tasks, project, setTasks }) => {
     async (taskId, projectId, status) => {
       setLoading(true);
       await updateStatus(taskId, projectId, status);
-      const data = await getTasks(projectId);
-      setTasks(data);
+      setTasks((prev) => {
+        return prev.map((task) => {
+          if (task.id === taskId) {
+            return { ...task, status };
+          }
+          return task;
+        });
+      });
       setTaskToEdit((prev) => {
         if (!prev) return null;
         return { ...prev, status };
@@ -477,9 +496,8 @@ const Tasks = ({ tasks, project, setTasks }) => {
     if (!project) return;
     setLoading(true);
     await deleteTask(taskToDelete.id, project.id);
-    const data = await getTasks(project.id);
+    setTasks((prev) => prev.filter((task) => task.id !== taskToDelete.id));
     toast.success("Task Deleted Successfully");
-    setTasks(data);
     setLoading(false);
     onDeleteClose();
   };
