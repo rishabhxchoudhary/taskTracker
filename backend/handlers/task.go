@@ -67,12 +67,14 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 		CreatedAt:    time.Now().Unix(),
 		Status:       body.Status,
 	}
-	if err := database.CreateTask(task); err != nil {
+
+	task, err = database.CreateTask(task)
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(task)
-
 }
 
 func GetBoardData(w http.ResponseWriter, r *http.Request) {

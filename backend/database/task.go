@@ -86,11 +86,16 @@ func SetBoardData(id primitive.ObjectID, boardData string) error {
 	return err
 }
 
-func CreateTask(task models.Task) error {
+func CreateTask(task models.Task) (models.Task, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	_, err := GetTaskCollection().InsertOne(ctx, task)
-	return err
+
+	result, err := GetTaskCollection().InsertOne(ctx, task)
+	if err != nil {
+		return task, err
+	}
+	task.ID = result.InsertedID.(primitive.ObjectID)
+	return task, nil
 }
 
 func UpdateTask(id string, task models.Task) error {
@@ -104,7 +109,7 @@ func UpdateTask(id string, task models.Task) error {
 	return err
 }
 
-func DeleteTask(taskID primitive.ObjectID, projectID primitive.ObjectID ) error {
+func DeleteTask(taskID primitive.ObjectID, projectID primitive.ObjectID) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	_, err := GetTaskCollection().DeleteOne(ctx, bson.M{"_id": taskID, "project_id": projectID})
