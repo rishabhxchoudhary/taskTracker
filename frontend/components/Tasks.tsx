@@ -291,7 +291,7 @@ const Tasks = ({ tasks, project, setTasks }) => {
           return cellValue;
       }
     },
-    [onDeleteOpen]
+    [onDeleteOpen, onEditOpen]
   );
 
   const onSearchChange = React.useCallback((value) => {
