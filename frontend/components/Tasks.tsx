@@ -528,7 +528,7 @@ const Tasks = ({ tasks, project, setTasks }) => {
               </TableColumn>
             )}
           </TableHeader>
-          <TableBody emptyContent={"No Tasks found"} items={sortedItems}>
+          <TableBody emptyContent={"No Task found"} items={sortedItems}>
             {(item) => (
               <TableRow
                 className="cursor-pointer"
