@@ -23,8 +23,8 @@ export const getTasks = async (projectId: string): Promise<TaskResponse[]>  => {
     return response.data || [];
 }
 
-export const createTask = async (title: string, description: string, projectId: string, priority: string, deadlineDate: number): Promise<null>  => {
-    await client.post('/task/create', {
+export const createTask = async (title: string, description: string, projectId: string, priority: string, deadlineDate: number): Promise<TaskInterface>  => {
+    const res = await client.post('/task/create', {
         title,
         description,
         priority,
@@ -32,7 +32,7 @@ export const createTask = async (title: string, description: string, projectId: 
         projectId,
         status: "to_do"
     });
-    return 
+    return res.data
 }
 
 export const deleteTask = async (taskId: string, projectId: string): Promise<null>  => {

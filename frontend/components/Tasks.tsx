@@ -33,7 +33,6 @@ import { CalendarDate, getLocalTimeZone, today } from "@internationalized/date";
 import {
   createTask,
   deleteTask,
-  getTasks,
   updateStatus,
 } from "../src/api/task";
 import { toast } from "sonner";
@@ -107,28 +106,19 @@ const Tasks = ({ tasks, project, setTasks }) => {
       );
       taskDeadlineDate2 = Math.floor(utcDate / 1000);
     }
-    await createTask(
+    const task = await createTask(
       taskTitle,
       taskDescription,
       project.id,
       taskPriority,
       taskDeadlineDate2
     );
+    console.log("task", task);
     // Return the tasks from the server instead of adding the task locally
-    // setTasks((prev) => [
-    //   ...prev,
-    //   {
-    //     id: Math.random().toString(),
-    //     title: taskTitle,
-    //     description: taskDescription,
-    //     priority: taskPriority,
-    //     deadline_date: taskDeadlineDate2,
-    //     status: "to_do",
-    //     created_at: Math.floor(Date.now() / 1000),
-    //   },
-    // ]);
-    const data = await getTasks(project.id);
-    setTasks(data);
+    setTasks((prev) => [
+      ...prev,
+      task,
+    ]);
     toast.success("Task Created Successfully");
     onOpen();
     setLoading(false);
