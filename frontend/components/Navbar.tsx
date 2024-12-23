@@ -185,14 +185,14 @@ export function NavbarComponent() {
                   />
                 </DropdownTrigger>
                 <DropdownMenu aria-label="Profile Actions" variant="flat">
-                  <DropdownItem key="profile" className="h-14 gap-2">
+                  <DropdownItem key="profile" className="h-14 gap-2 text-white">
                     <p className="font-semibold">Signed in as</p>
                     <p className="font-semibold">{auth?.user?.username}</p>
                     <p className="">{auth?.user?.email}</p>
                   </DropdownItem>
                   <DropdownItem key="logout">
                     <Button
-                      variant="ghost"
+                      variant="shadow"
                       color="danger"
                       onPress={auth?.logout}
                     >
