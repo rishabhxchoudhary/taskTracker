@@ -114,7 +114,6 @@ const Tasks = ({ tasks, project, setTasks }) => {
       taskDeadlineDate2
     );
     console.log("task", task);
-    // Return the tasks from the server instead of adding the task locally
     setTasks((prev) => [
       ...prev,
       task,

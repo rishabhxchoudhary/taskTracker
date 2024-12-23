@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { DragDropContext, DropResult, Droppable } from 'react-beautiful-dnd';
 import { TaskInterface } from '../../types/types';
 import Column from './Column';
-import DeleteArea from './DeleteArea';
+// import DeleteArea from './DeleteArea';
+import { updateStatus } from '../../src/api/task';
+import { useProjectStore } from '../../store/projectStore';
 
 interface KanbanBoardProps {
     tasks: TaskInterface[];
@@ -10,8 +12,8 @@ interface KanbanBoardProps {
 
 const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks: initialTasks }) => {
     const [tasks, setTasks] = useState<TaskInterface[]>(initialTasks);
-
-    const onDragEnd = (result: DropResult) => {
+    const project = useProjectStore((state) => state.currentProject);
+    const onDragEnd = async (result: DropResult) => {
         const { destination, source, draggableId } = result;
 
         if (!destination) return;
@@ -27,6 +29,8 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks: initialTasks }) => {
         ) {
             return;
         }
+        // Call backend to update the task status
+        await updateStatus(draggableId, project.id, destination.droppableId);
         setTasks(prevTasks => {
             const task = prevTasks.find(t => t.id === draggableId);
             if (!task) return prevTasks;
@@ -71,7 +75,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks: initialTasks }) => {
                         </Droppable>
                     ))}
                 </div>
-                <DeleteArea />
+                {/* <DeleteArea /> */}
             </DragDropContext>
         </div>
     );
