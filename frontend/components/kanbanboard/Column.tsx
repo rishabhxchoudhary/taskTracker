@@ -1,5 +1,5 @@
 import React from 'react';
-import { DroppableProvided } from 'react-beautiful-dnd';
+import { DroppableProvided } from '@hello-pangea/dnd';
 import clsx from 'clsx';
 import TaskCard from './TaskCard';
 import { TaskInterface } from '../../types/types';

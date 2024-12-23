@@ -1,5 +1,5 @@
 import React from 'react';
-import { Draggable } from 'react-beautiful-dnd';
+import { Draggable } from '@hello-pangea/dnd';
 import clsx from 'clsx';
 import { TaskInterface } from '../../types/types';
 import { CalendarDate } from '@nextui-org/react';

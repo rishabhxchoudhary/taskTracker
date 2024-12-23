@@ -1,5 +1,5 @@
 import React from 'react';
-import { DragDropContext, DropResult, Droppable } from 'react-beautiful-dnd';
+import { DragDropContext, DropResult, Droppable } from '@hello-pangea/dnd';
 import { TaskInterface } from '../../types/types';
 import Column from './Column';
 // import DeleteArea from './DeleteArea';
