@@ -29,8 +29,6 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, setTasks }) => {
         ) {
             return;
         }
-        // Call backend to update the task status
-        await updateStatus(draggableId, project.id, destination.droppableId);
         setTasks(prevTasks => {
             const task = prevTasks.find(t => t.id === draggableId);
             if (!task) return prevTasks;
@@ -40,6 +38,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, setTasks }) => {
             filteredTasks.splice(destination.index, 0, updatedTask);
             return filteredTasks;
         });
+        await updateStatus(draggableId, project.id, destination.droppableId);
     };
 
     const columns = {
