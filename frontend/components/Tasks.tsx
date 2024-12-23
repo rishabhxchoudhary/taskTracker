@@ -733,7 +733,7 @@ const Tasks = ({ tasks, project, setTasks }) => {
                 <Dropdown>
                   <DropdownTrigger>
                     <Button
-                      radius="full"
+                      // radius="full"
                       color={
                         taskToEdit.status == "to_do"
                           ? "danger"
@@ -741,8 +741,8 @@ const Tasks = ({ tasks, project, setTasks }) => {
                           ? "warning"
                           : "success"
                       }
-                      size="sm"
-                      variant="faded"
+                      size="lg"
+                      variant="shadow"
                     >
                       {taskToEdit.status
                         ? taskToEdit.status == "to_do"
@@ -755,6 +755,8 @@ const Tasks = ({ tasks, project, setTasks }) => {
                   </DropdownTrigger>
                   <DropdownMenu>
                     <DropdownItem
+                      color="danger"
+                      className="text-danger"
                       onPress={() => {
                         updateTaskStatus(taskToEdit.id, project.id, "to_do");
                       }}
@@ -763,6 +765,8 @@ const Tasks = ({ tasks, project, setTasks }) => {
                       To Do
                     </DropdownItem>
                     <DropdownItem
+                      color="warning"
+                      className="text-warning"
                       onPress={() => {
                         updateTaskStatus(
                           taskToEdit.id,
@@ -778,6 +782,8 @@ const Tasks = ({ tasks, project, setTasks }) => {
                       onPress={() => {
                         updateTaskStatus(taskToEdit.id, project.id, "done");
                       }}
+                      color="success"
+                      className="text-success"
                       key="done"
                     >
                       Done
