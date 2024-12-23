@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { DragDropContext, DropResult, Droppable } from 'react-beautiful-dnd';
 import { TaskInterface } from '../../types/types';
 import Column from './Column';
@@ -8,10 +8,10 @@ import { useProjectStore } from '../../store/projectStore';
 
 interface KanbanBoardProps {
     tasks: TaskInterface[];
+    setTasks: React.Dispatch<React.SetStateAction<TaskInterface[]>>;
 }
 
-const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks: initialTasks }) => {
-    const [tasks, setTasks] = useState<TaskInterface[]>(initialTasks);
+const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, setTasks }) => {
     const project = useProjectStore((state) => state.currentProject);
     const onDragEnd = async (result: DropResult) => {
         const { destination, source, draggableId } = result;

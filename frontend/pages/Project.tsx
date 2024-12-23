@@ -31,7 +31,7 @@ const Project = () => {
     {
       id: "kanban",
       label: "Kanban Board",
-      content: <KanbanBoard tasks={tasks} />,
+      content: <KanbanBoard setTasks={setTasks} tasks={tasks} />,
     },
     {
       id: "pomodoro",
