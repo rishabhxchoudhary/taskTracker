@@ -4,7 +4,7 @@ import { Divider } from '@nextui-org/react';
 import { Toaster } from 'sonner'
 function Layout({ children }) {
     return (
-        <div className='dark text-foreground bg-background flex flex-col'  style={{ minHeight: "100vh"}}>
+        <div className='flex flex-col'  style={{ minHeight: "100vh"}}>
             <Toaster/>
             <NavbarComponent />
             <Divider/>

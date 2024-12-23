@@ -118,7 +118,7 @@ export function NavbarComponent() {
                 <DropdownSection showDivider={true} aria-label="projects">
                   {projects.map((project: Project) => (
                     <DropdownItem
-                      className="text-white"
+                      // className=""
                       key={project.id}
                       title={project.name}
                       description={project.description.length > 50 ? project.description.slice(0, 50) + "..." : project.description}
@@ -142,7 +142,7 @@ export function NavbarComponent() {
 
                 <DropdownSection aria-label="create-new-project">
                   <DropdownItem
-                    className="text-white"
+                    // className=""
                     key="create-new"
                     startContent={<RiStickyNoteAddLine />}
                     title="Create New Project"
@@ -185,7 +185,7 @@ export function NavbarComponent() {
                   />
                 </DropdownTrigger>
                 <DropdownMenu aria-label="Profile Actions" variant="flat">
-                  <DropdownItem key="profile" className="h-14 gap-2 text-white">
+                  <DropdownItem key="profile" className="h-14 gap-2 ">
                     <p className="font-semibold">Signed in as</p>
                     <p className="font-semibold">{auth?.user?.username}</p>
                     <p className="">{auth?.user?.email}</p>
@@ -220,8 +220,8 @@ export function NavbarComponent() {
                   title={`You have only 1 project. If you delete this, a new Sample Project will be created`}
                 />
               )}
-              <ModalHeader className="text-white">Delete Project</ModalHeader>
-              <ModalBody className="text-white">
+              <ModalHeader className="">Delete Project</ModalHeader>
+              <ModalBody className="">
                 <p>
                   Are you sure you want to delete the project{" "}
                   <strong>{projectToDelete?.name}</strong>? This action cannot
@@ -245,7 +245,7 @@ export function NavbarComponent() {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="text-white">Create New Project</ModalHeader>
+              <ModalHeader className="">Create New Project</ModalHeader>
               <ModalBody>
                 <Input
                   label="Project Name"
