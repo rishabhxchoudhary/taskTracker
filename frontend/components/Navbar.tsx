@@ -118,6 +118,7 @@ export function NavbarComponent() {
                 <DropdownSection showDivider={true} aria-label="projects">
                   {projects.map((project: Project) => (
                     <DropdownItem
+                      className="text-white"
                       key={project.id}
                       title={project.name}
                       description={project.description.length > 50 ? project.description.slice(0, 50) + "..." : project.description}
@@ -125,6 +126,8 @@ export function NavbarComponent() {
                       endContent={
                         <Button
                           isIconOnly
+                          color="danger"
+                          variant="flat"
                           onPress={() => {
                             setProjectToDelete(project);
                             onDeleteOpen();
@@ -139,6 +142,7 @@ export function NavbarComponent() {
 
                 <DropdownSection aria-label="create-new-project">
                   <DropdownItem
+                    className="text-white"
                     key="create-new"
                     startContent={<RiStickyNoteAddLine />}
                     title="Create New Project"
@@ -216,8 +220,8 @@ export function NavbarComponent() {
                   title={`You have only 1 project. If you delete this, a new Sample Project will be created`}
                 />
               )}
-              <ModalHeader>Delete Project</ModalHeader>
-              <ModalBody>
+              <ModalHeader className="text-white">Delete Project</ModalHeader>
+              <ModalBody className="text-white">
                 <p>
                   Are you sure you want to delete the project{" "}
                   <strong>{projectToDelete?.name}</strong>? This action cannot
@@ -241,7 +245,7 @@ export function NavbarComponent() {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader>Create New Project</ModalHeader>
+              <ModalHeader className="text-white">Create New Project</ModalHeader>
               <ModalBody>
                 <Input
                   label="Project Name"
