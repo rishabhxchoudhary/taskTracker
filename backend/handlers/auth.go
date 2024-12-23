@@ -40,12 +40,11 @@ func GoogleLogin(w http.ResponseWriter, r *http.Request) {
 			Email:     body.Email,
 			CreatedAt: time.Now().Unix(),
 		}
-
-		if err := database.CreateUser(newUser); err != nil {
+		user, err = database.CreateUser(newUser)
+		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		user = newUser
 	}
 	token, err := GenerateJWT(user)
 	if err != nil {

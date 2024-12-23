@@ -36,12 +36,17 @@ func GetAllUsers() ([]models.User, error) {
 	return users, nil
 }
 
-func CreateUser(user models.User) error {
+// returns the newly created user and an error
+func CreateUser(user models.User) (models.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	_, err := GetUserCollection().InsertOne(ctx, user)
-	return err
+	result, err := GetUserCollection().InsertOne(ctx, user)
+	if err != nil {
+		return user, err
+	}
+	user.ID = result.InsertedID.(primitive.ObjectID)
+	return user, nil
 }
 
 func GetUserByID(id string) (models.User, error) {

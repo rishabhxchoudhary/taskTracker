@@ -28,7 +28,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	currentTime := time.Now()
     unixMillis := currentTime.UnixMilli()
 	user.CreatedAt = unixMillis
-	if err := database.CreateUser(user); err != nil {
+	if _, err := database.CreateUser(user); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
