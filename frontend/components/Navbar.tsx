@@ -293,6 +293,29 @@ export function NavbarComponent() {
             </NavbarItem>
           )}
           <NavbarItem>
+            <Link color="success" href="https://forms.gle/obmjKxBUyYGCe9Xd7">Feedback Link</Link>
+          </NavbarItem>
+          {isRunning && (
+            <NavbarItem>
+              <CircularProgress
+                color={getModeColor(mode)}
+                aria-label="Timer Progress"
+                classNames={{
+                  svg: "drop-shadow-md",
+                  track: `stroke-white/10`,
+                  value: `text-${getModeColor(
+                    mode
+                  )} font-semibold drop-shadow-md`,
+                }}
+                showValueLabel={true}
+                strokeWidth={1}
+                value={(timeLeft/maxTime)*100}
+                valueLabel={formatTime(timeLeft)}
+              />
+            </NavbarItem>
+          )}
+        </NavbarContent>
+        <NavbarItem>
             {auth && auth.user ? (
               <Dropdown placement="bottom-end">
                 <DropdownTrigger>
@@ -300,7 +323,7 @@ export function NavbarComponent() {
                     isBordered
                     as="button"
                     className="transition-transform"
-                    color="primary"
+                    color="default"
                     name={auth?.user?.username}
                     size="sm"
                     src={auth?.user?.avatar}
@@ -334,27 +357,6 @@ export function NavbarComponent() {
               </Button>
             )}
           </NavbarItem>
-          <Link href="https://forms.gle/obmjKxBUyYGCe9Xd7">Feedback</Link>
-          {isRunning && (
-            <NavbarItem>
-              <CircularProgress
-                color={getModeColor(mode)}
-                aria-label="Timer Progress"
-                classNames={{
-                  svg: "drop-shadow-md m-10",
-                  track: `stroke-white/10`,
-                  value: `text-${getModeColor(
-                    mode
-                  )} font-semibold drop-shadow-md`,
-                }}
-                showValueLabel={true}
-                strokeWidth={1}
-                value={(timeLeft/maxTime)*100}
-                valueLabel={formatTime(timeLeft)}
-              />
-            </NavbarItem>
-          )}
-        </NavbarContent>
       </Navbar>
 
       <Modal isOpen={isDeleteOpen} onOpenChange={onDeleteClose} closeButton>
