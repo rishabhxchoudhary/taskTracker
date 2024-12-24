@@ -7,6 +7,8 @@ import { persist } from "zustand/middleware";
 export const useProjectStore = create(
   persist<ProjectStore>(
     (set) => ({
+      selectedTab: "list",
+      setSelectedTab: (tab: string) => set({ selectedTab: tab }),
       currentProject: null,
       currentDate: today(getLocalTimeZone()),
       setCurrentProject: async (project: Project) => {
@@ -19,7 +21,7 @@ export const useProjectStore = create(
         toast.success("Date Selected Successfully");
       },
       reset: () => {
-        set({ currentProject: null, currentDate: today(getLocalTimeZone()) });
+        set({ currentProject: null, currentDate: today(getLocalTimeZone()), selectedTab: "list" });
         useProjectStore.persist?.clearStorage();
       },
     }),

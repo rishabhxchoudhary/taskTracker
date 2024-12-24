@@ -34,9 +34,11 @@ export interface Project {
 export interface ProjectStore {
     currentProject: Project | null ;
     currentDate: CalendarDate;
+    selectedTab: string; 
     reset: () => void;
     setCurrentProject: (project: Project) => void;
     setCurrentDate: (date: CalendarDate) => void;
+    setSelectedTab: (tab: string) => void; 
 }
 
 export interface TaskInterface {

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import Layout from "../layouts/Layout";
 import { TaskInterface } from "../types/types";
 import { getTasks } from "../src/api/task";
@@ -10,17 +10,18 @@ import KanbanBoard from "../components/kanbanboard/KanbanBoard";
 import PomodoroTimer from "../components/PomodoroTimer";
 
 const Project = () => {
-  const project = useProjectStore((state) => state.currentProject);
+  const project = useProjectStore((state) => state);
+
   const [tasks, setTasks] = React.useState<TaskInterface[]>([]);
-  useEffect(()=>{
+  React.useEffect(()=>{
     const getData = async () => {
-      if (!project?.id) return;
-      const data = await getTasks(project.id);
+      if (!project.currentProject?.id) return;
+      const data = await getTasks(project.currentProject.id);
       toast.success("Tasks Fetched Successfully");
       setTasks(data);
     }
     getData();
-  },[project?.id])
+  },[project.currentProject?.id])
 
   const tabs = [
     {
@@ -42,7 +43,7 @@ const Project = () => {
   
   return (
     <Layout>
-      <Tabs aria-label="Dynamic tabs" items={tabs}>
+      <Tabs selectedKey={project.selectedTab} onSelectionChange={project.setSelectedTab} aria-label="Dynamic tabs" items={tabs}>
         {(item) => (
           <Tab key={item.id} title={item.label}>
             {item.content}
