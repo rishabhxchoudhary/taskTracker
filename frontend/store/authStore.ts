@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { AuthState, User } from '../types/types';
 import { getCurrentUser, logoutUser } from '../src/api/auth';
 import { toast } from 'sonner';
+import { useProjectStore } from './projectStore';
 
 export const useAuthStore = create<AuthState>((set) => ({
     user: null,
@@ -23,6 +24,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         try {
             await logoutUser();
             set({ user: null, status: 'unauthenticated' });
+            useProjectStore.getState().reset();
             toast.success("Logged Out Successfully");
         } catch (error) {
             console.error('Logout failed:', error);

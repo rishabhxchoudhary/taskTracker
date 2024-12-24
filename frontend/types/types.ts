@@ -33,6 +33,7 @@ export interface Project {
 export interface ProjectStore {
     currentProject: Project | null ;
     currentDate: CalendarDate;
+    reset: () => void;
     setCurrentProject: (project: Project) => void;
     setCurrentDate: (date: CalendarDate) => void;
 }

@@ -18,6 +18,10 @@ export const useProjectStore = create(
         set({ currentDate: date });
         toast.success("Date Selected Successfully");
       },
+      reset: () => {
+        set({ currentProject: null, currentDate: today(getLocalTimeZone()) });
+        useProjectStore.persist?.clearStorage();
+      },
     }),
     {
       name: "project-storage",
