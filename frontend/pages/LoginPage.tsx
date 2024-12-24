@@ -79,7 +79,7 @@ export default function Login() {
             </Link>
           </CardFooter> */}
           <CardBody>
-            <GoogleLogin onSuccess={loginWithGoogle} />
+            <GoogleLogin onSuccess={loginWithGoogle} useOneTap />
           </CardBody>
         </Card>
 
