@@ -20,7 +20,6 @@ const Canvas = ({ initialData }: { initialData: string }) => {
     try {
       await setBoardData(taskId, finalElements);
       toast.success("Board saved successfully.");
-      console.log("Board data saved successfully.");
     } catch (error) {
       console.error("Error saving board data:", error);
     }
@@ -79,7 +78,6 @@ const Canvas = ({ initialData }: { initialData: string }) => {
           },
         }}
         onChange={(excaliDrawElements) => {
-          console.log("Elements changed");
           setWhiteBoard(excaliDrawElements);
         }}
       >

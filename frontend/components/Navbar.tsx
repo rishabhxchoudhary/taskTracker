@@ -27,13 +27,32 @@ import { useAuthStore } from "../store/authStore";
 import { useProjectStore } from "../store/projectStore";
 import React from "react";
 import { createProject, deleteProject, getProjects } from "../src/api/project";
-import { Project } from "../types/types";
 import { MdDelete } from "react-icons/md";
 import { Alert } from "@nextui-org/react";
 import { useNavigate } from "react-router-dom";
 import { Howl } from "howler";
 import useTimerStore from "../store/timerStore";
 import { getModeColor } from "../utils/utils";
+import { useGoogleLogin } from "@react-oauth/google";
+import { googleLogin } from "../src/api/auth";
+import { toast } from "sonner";
+import axios from "axios";
+import { Project } from "../types/types";
+
+const googlecallback = async (token) => {
+  const googleRes = await axios.get(
+    "https://www.googleapis.com/oauth2/v3/userinfo",
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: {
+        personFileds: "emailAddresses,names,photos",
+      },
+    }
+  );
+  return googleRes.data
+};
 
 const alertSound = new Howl({
   src: ["/sounds/alarm.mp3"],
@@ -68,6 +87,21 @@ export function NavbarComponent() {
     pauseTimer,
   } = useTimerStore();
   const timerRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  const loginClick = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      const callbackdata = await googlecallback(tokenResponse.access_token);
+      const data = await googleLogin({
+        email: callbackdata.email,
+        name: callbackdata.name,
+        avatar: callbackdata.picture,
+      });
+      auth?.login(data);
+      navigate("/project");
+      toast.success("Logged In Successfully");
+    }
+  });
+
   React.useEffect(() => {
     if (isRunning && timeLeft > 0) {
       timerRef.current = setInterval(() => {
@@ -293,12 +327,10 @@ export function NavbarComponent() {
               <Button
                 as={Link}
                 color="primary"
-                onPress={() => {
-                  navigate("/login");
-                }}
+                onPress={()=>{loginClick()}}
                 variant="flat"
               >
-                Log In
+                Log in with Google
               </Button>
             )}
           </NavbarItem>

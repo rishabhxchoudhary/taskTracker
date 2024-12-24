@@ -36,14 +36,9 @@ export default function Login() {
       navigate("/project");
       toast.success("Logged In Successfully");
     } else {
-      console.log("Login Failed");
       toast.error("Login Failed");
     }
   };
-
-  // const loginFunction = async ()=>{
-    
-  // }
 
   return (
     <Layout>

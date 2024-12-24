@@ -113,7 +113,6 @@ const Tasks = ({ tasks, project, setTasks }) => {
       taskPriority,
       taskDeadlineDate2
     );
-    console.log("task", task);
     setTasks((prev) => [
       ...prev,
       task,

@@ -4,33 +4,18 @@ import Layout2 from '../layouts/Layout';
 import { useAuthStore } from '../store/authStore';
 import { FaProjectDiagram, FaTasks, FaClock } from 'react-icons/fa';
 import { BiColumns } from "react-icons/bi";
-import { useGoogleOneTapLogin } from '@react-oauth/google';
-import { GoogleJWT } from '../types/types';
-import { jwtDecode } from 'jwt-decode';
-import { googleLogin } from '../src/api/auth';
-import { toast } from 'sonner';
+// import { useGoogleOneTapLogin } from '@react-oauth/google';
+// import { GoogleJWT } from '../types/types';
+// import { jwtDecode } from 'jwt-decode';
+// import { googleLogin } from '../src/api/auth';
+// import { toast } from 'sonner';
 
 const Home = () => {
   const navigate = useNavigate();
   const { user } = useAuthStore((state) => state);
-  const auth = useAuthStore((state) => state)
-  useGoogleOneTapLogin({
-    onSuccess: async (credentialResponse) => {
-      console.log(credentialResponse);
-      const decoded: GoogleJWT = jwtDecode(credentialResponse.credential);
-      const data = await googleLogin(decoded);
-      auth?.login(data);
-      navigate("/project");
-      toast.success("Logged In Successfully");
-    },
-    onError: () => {
-      console.log('Login Failed');
-    },
-  });
 
   React.useEffect(() => {
     if (user) {
-      console.log("User is logged in");
       navigate('/project');
     }
   }, [user, navigate]);
