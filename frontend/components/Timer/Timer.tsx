@@ -3,8 +3,8 @@ import useTimerStore from '../../store/timerStore';
 import { Howl } from 'howler';
 
 const alertSound = new Howl({
-  src: ['/sounds/alert.mp3'],
-  volume: 0.5, // Adjust volume as needed
+  src: ['../../assets/sounds/alarm.mp3'],
+  volume: 0.5, 
 });
 
 

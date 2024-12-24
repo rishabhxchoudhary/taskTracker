@@ -1,11 +1,9 @@
-// src/components/Controls.tsx
 import React from 'react';
 import { Howl } from 'howler';
 import useTimerStore from '../../store/timerStore';
 
-
 const buttonSound = new Howl({
-  src: ['/sounds/button.mp3'],
+  src: ['../../assets/sounds/button.wav'],
   volume: 0.5, 
 });
 
@@ -20,6 +18,7 @@ const Controls: React.FC = () => {
   const handlePause = () => {
     pauseTimer();
     stopAllSounds();
+    buttonSound.play();
   };
 
   const handleReset = () => {
