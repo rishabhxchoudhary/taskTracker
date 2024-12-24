@@ -29,7 +29,7 @@ import { createProject, deleteProject, getProjects } from "../src/api/project";
 import { Project } from "../types/types";
 import { MdDelete } from "react-icons/md";
 import { Alert } from "@nextui-org/react";
-// import React from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Howl } from 'howler';
 import useTimerStore from "../store/timerStore";
@@ -45,6 +45,12 @@ function convertTimestampToCalendarDate(unixTimestamp: number) {
   const day = date.getDate();
   return new CalendarDate(year, month, day);
 }
+
+const formatTime = (seconds: number) => {
+  const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+  const s = (seconds % 60).toString().padStart(2, '0');
+  return `${m}:${s}`;
+};
 
 export function NavbarComponent() {
   const { timeLeft, isRunning, decrementTime, mode, setMode, incrementCycle, cycle, pauseTimer } = useTimerStore();
@@ -248,6 +254,11 @@ export function NavbarComponent() {
               </Button>
             )}
           </NavbarItem>
+          {isRunning && (
+            <NavbarItem>
+            {formatTime(timeLeft)}
+            </NavbarItem>
+          )}
         </NavbarContent>
       </Navbar>
 
