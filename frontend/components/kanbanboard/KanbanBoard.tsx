@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { DragDropContext, DropResult, Droppable } from '@hello-pangea/dnd';
 import { TaskInterface } from '../../types/types';
 import Column from './Column';
-import DeleteArea from './DeleteArea';
+// import DeleteArea from './DeleteArea';
 import { updateStatus } from '../../src/api/task';
 import { useProjectStore } from '../../store/projectStore';
 
@@ -119,7 +119,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, setTasks }) => {
                         </Droppable>
                     ))}
                 </div>
-                <DeleteArea />
+                {/* <DeleteArea /> */}
             </DragDropContext>
         </div>
     );
