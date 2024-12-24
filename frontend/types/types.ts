@@ -46,3 +46,18 @@ export interface TaskInterface {
     board_data: string | null;
     status: "to_do" | "in_progress" | "done";
 }
+
+
+export type TimerState = {
+  mode: 'work' | 'shortBreak' | 'longBreak';
+  timeLeft: number; // in seconds
+  isRunning: boolean;
+  cycle: number;
+  setMode: (mode: 'work' | 'shortBreak' | 'longBreak') => void;
+  startTimer: () => void;
+  pauseTimer: () => void;
+  resetTimer: () => void;
+  decrementTime: () => void;
+  incrementCycle: () => void;
+  setTimeLeft: (time: number) => void;
+};

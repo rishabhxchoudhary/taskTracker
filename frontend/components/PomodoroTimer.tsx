@@ -1,9 +1,27 @@
-// import React from 'react'
+// src/App.tsx
+import React, { useEffect } from 'react';
+import Timer from './Timer/Timer';
+import Controls from './Timer/Controls';
+import Tabs from './Timer/Tabs';
 
-const PomodoroTimer = () => {
+const App: React.FC = () => {
+  useEffect(() => {
+    if ('Notification' in window) {
+      if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
+        Notification.requestPermission();
+      }
+    }
+  }, []);
+
   return (
-    <div>PomodoroTimer</div>
-  )
-}
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
+      <div className=" p-8 rounded shadow-md w-full max-w-md">
+        <Tabs />
+        <Timer />
+        <Controls />
+      </div>
+    </div>
+  );
+};
 
-export default PomodoroTimer
+export default App;
