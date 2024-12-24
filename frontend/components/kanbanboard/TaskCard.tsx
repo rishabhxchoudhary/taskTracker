@@ -28,14 +28,14 @@ const formatCalendarDate = (date: CalendarDate): string => {
 const TaskCard: React.FC<TaskCardProps> = ({ task, index }) => {
     return (
         <Draggable draggableId={task.id} index={index}>
-            {(provided, snapshot) => (
+            {(provided) => (
                 <div
                     className={clsx(
                         "border",
                         "text-black",
                         "p-4 rounded shadow mb-2",
                         priorityColors[task.priority],
-                        snapshot.isDragging ? "bg-gray-300" : ""
+                        // snapshot.isDragging ? "bg-gray-300" : ""
                     )}
                     ref={provided.innerRef}
                     {...provided.draggableProps}
@@ -44,7 +44,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index }) => {
                     <h3 className="font-bold text-lg">{task.title}</h3>
                     <p className="text-sm mt-1">{task.description}</p>
                     {task.deadlineDate && (
-                        <p className="text-xs  mt-2">
+                        <p className="text-xs mt-2">
                             Deadline: {formatCalendarDate(task.deadlineDate)}
                         </p>
                     )}

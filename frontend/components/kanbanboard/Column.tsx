@@ -25,7 +25,7 @@ const Column: React.FC<ColumnProps> = ({ title, tasks, provided, isDraggingOver 
             <div
                 className={clsx(
                     "flex-1 p-2 rounded-md",
-                    isDraggingOver ? "bg-blue-100" : ""
+                    isDraggingOver ? "bg-white/20" : ""
                 )}
             >
                 {tasks.map((task, index) => (
