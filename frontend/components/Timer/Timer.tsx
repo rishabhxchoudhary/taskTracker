@@ -41,7 +41,7 @@ const Timer: React.FC = () => {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [isRunning, timeLeft, mode, decrementTime, setMode, incrementCycle, cycle]);
+  }, [isRunning, timeLeft, mode, decrementTime, setMode, incrementCycle, cycle, pauseTimer]);
 
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60).toString().padStart(2, '0');
