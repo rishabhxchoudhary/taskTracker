@@ -31,7 +31,12 @@ export default function Login() {
   const loginWithGoogle = async (response: CredentialResponse) => {
     if (response.credential) {
       const decoded: GoogleJWT = jwtDecode(response.credential);
-      const data = await googleLogin(decoded);
+      const data = await googleLogin({
+        email: decoded.email,
+        name: decoded.name,
+        // @ts-expect-error "cnla"
+        avatar: decoded.picture,
+      });
       auth?.login(data);
       navigate("/project");
       toast.success("Logged In Successfully");
