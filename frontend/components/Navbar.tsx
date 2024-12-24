@@ -24,14 +24,20 @@ import { DatePicker } from "@nextui-org/react";
 import { getLocalTimeZone, today, CalendarDate } from "@internationalized/date";
 import { useAuthStore } from "../store/authStore";
 import { useProjectStore } from "../store/projectStore";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createProject, deleteProject, getProjects } from "../src/api/project";
 import { Project } from "../types/types";
 import { MdDelete } from "react-icons/md";
 import { Alert } from "@nextui-org/react";
-// import React from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
+import { Howl } from 'howler';
+import useTimerStore from "../store/timerStore";
 
+const alertSound = new Howl({
+  src: ['../../assets/sounds/alarm.mp3'],
+  volume: 0.5, 
+});
 function convertTimestampToCalendarDate(unixTimestamp: number) {
   const date = new Date(unixTimestamp * 1000);
   const year = date.getFullYear();
@@ -41,6 +47,38 @@ function convertTimestampToCalendarDate(unixTimestamp: number) {
 }
 
 export function NavbarComponent() {
+  const { timeLeft, isRunning, decrementTime, mode, setMode, incrementCycle, cycle, pauseTimer } = useTimerStore();
+    //   @ts-expect-error "nodejs not found."
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  useEffect(() => {
+      if (isRunning && timeLeft > 0) {
+        timerRef.current = setInterval(() => {
+          decrementTime();
+        }, 1000);
+      } else if (timeLeft === 0) {
+        alertSound.play();
+        pauseTimer()
+        if (Notification.permission === 'granted') {
+          new Notification(`Time for ${mode === 'work' ? 'a break!' : 'work!'}`);
+        }
+        if (mode === 'work') {
+          if ((cycle + 1) % 2 === 0) {
+            setMode('longBreak');
+          } else {
+            setMode('shortBreak');
+          }
+        } else {
+          setMode('work');
+          if (mode === 'shortBreak') {
+            incrementCycle();
+          }
+        }
+      }
+      return () => {
+        if (timerRef.current) clearInterval(timerRef.current);
+      };
+    }, [isRunning, timeLeft, mode, decrementTime, setMode, incrementCycle, cycle, pauseTimer]);
+
   const navigate = useNavigate();
   const auth = useAuthStore((state) => state);
   const projectStore = useProjectStore((state) => state);
