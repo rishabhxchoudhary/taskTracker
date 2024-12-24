@@ -338,10 +338,10 @@ export function NavbarComponent() {
           {isRunning && (
             <NavbarItem>
               <CircularProgress
+                color={getModeColor(mode)}
                 aria-label="Timer Progress"
                 classNames={{
                   svg: "drop-shadow-md m-10",
-                  indicator: `stroke-${getModeColor(mode)}`,
                   track: `stroke-white/10`,
                   value: `text-${getModeColor(
                     mode

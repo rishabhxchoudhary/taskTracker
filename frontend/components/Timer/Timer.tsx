@@ -20,9 +20,9 @@ const Timer = () => {
     <div>
       <CircularProgress
         aria-label="Timer Progress"
+        color={getModeColor(mode)}
         classNames={{
           svg: "w-80 h-80 drop-shadow-md m-10",
-          indicator: `stroke-${getModeColor(mode)}`,
           track: `stroke-white/10`,
           value: `text-3xl text-${getModeColor(mode)} font-semibold drop-shadow-md`,
         }}
