@@ -32,6 +32,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index }) => {
                 <div
                     className={clsx(
                         "border",
+                        "text-black",
                         "p-4 rounded shadow mb-2",
                         priorityColors[task.priority],
                         snapshot.isDragging ? "bg-gray-300" : ""
@@ -43,7 +44,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index }) => {
                     <h3 className="font-bold text-lg">{task.title}</h3>
                     <p className="text-sm mt-1">{task.description}</p>
                     {task.deadlineDate && (
-                        <p className="text-xs text-gray-600 mt-2">
+                        <p className="text-xs  mt-2">
                             Deadline: {formatCalendarDate(task.deadlineDate)}
                         </p>
                     )}

@@ -14,7 +14,7 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
+    <div className="min-h-[70vh] flex flex-col items-center justify-center">
       <div className=" p-8 rounded shadow-md w-full max-w-md">
         <Tabs />
         <Timer />

@@ -91,6 +91,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, setTasks }) => {
             return newColumns;
         });
         if (sourceColumnId !== destColumnId) {
+            if (!project) return;
             await updateStatus(draggableId, project.id, destColumnId);
             setTasks(prevTasks =>
                 prevTasks.map(task =>
@@ -101,7 +102,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, setTasks }) => {
     };
 
     return (
-        <div className="flex flex-col h-screen bg-gray-50">
+        <div className="flex flex-col">
             <DragDropContext onDragEnd={onDragEnd}>
                 <div className="flex flex-1 space-x-4 p-4 overflow-auto">
                     {Object.entries(columns).map(([columnId, tasks]) => (

@@ -7,18 +7,18 @@ import clsx from 'clsx';
 const DeleteArea: React.FC = () => {
     return (
         <Droppable droppableId="delete">
-            {(provided, snapshot) => (
+            {(provided) => (
                 <div
                     ref={provided.innerRef}
                     {...provided.droppableProps}
                     className={clsx(
-                        "flex items-center justify-center",
+                        "flex items-center justify-center py-4 mx-2 rounded-lg",
                         "h-20",
-                        "border-2 border-dashed border-red-500",
-                        snapshot.isDraggingOver ? "bg-red-100" : "bg-white"
+                        "border-2 border-dashed border-white-500",
+                        // snapshot.isDraggingOver ? "text-black" : ""
                     )}
                 >
-                    <span className="text-red-500 font-semibold">Drag here to delete</span>
+                    <span className="font-semibold">Drag here to delete</span>
                     {provided.placeholder}
                 </div>
             )}
