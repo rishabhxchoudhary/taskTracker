@@ -12,3 +12,13 @@ export function getPriorityIndex(priority: string) {
       return 1000;
   }
 }
+
+export function getModeColor(mode: "work" | "shortBreak" | "longBreak") {
+  if (mode=="work") {
+    return "danger"
+  } else if (mode=="shortBreak") {
+    return "warning"
+  } else {
+    return "success"
+  }
+}

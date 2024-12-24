@@ -1,4 +1,5 @@
 import { CalendarDate } from "@nextui-org/react";
+// import React from "react";
 
 export interface User {
     id: string;
@@ -53,6 +54,7 @@ export type TimerState = {
   mode: 'work' | 'shortBreak' | 'longBreak';
   timeLeft: number; // in seconds
   isRunning: boolean;
+  maxTime: number;
   cycle: number;
   setMode: (mode: 'work' | 'shortBreak' | 'longBreak') => void;
   startTimer: () => void;

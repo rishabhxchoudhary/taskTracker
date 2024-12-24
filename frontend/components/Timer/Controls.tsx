@@ -1,6 +1,7 @@
 import React from 'react';
 import { Howl } from 'howler';
 import useTimerStore from '../../store/timerStore';
+import { Button } from '@nextui-org/react';
 
 const buttonSound = new Howl({
   src: ['/sounds/button.wav'],
@@ -35,26 +36,29 @@ const Controls: React.FC = () => {
   return (
     <div className="flex justify-center mt-4 space-x-4">
       {!isRunning ? (
-        <button
-          className="px-4 py-2 bg-green-500 rounded hover:bg-green-600"
-          onClick={handleStart}
+        <Button
+          color="success"
+          size='lg'
+          onPress={handleStart}
         >
           Start
-        </button>
+        </Button>
       ) : (
-        <button
-          className="px-4 py-2 bg-yellow-500 rounded hover:bg-yellow-600"
-          onClick={handlePause}
+        <Button
+          size='lg'
+          color='warning'
+          onPress={handlePause}
         >
           Pause
-        </button>
+        </Button>
       )}
-      <button
-        className="px-4 py-2 bg-red-500 rounded hover:bg-red-600"
-        onClick={handleReset}
+      <Button
+        size='lg'
+        color='danger'
+        onPress={handleReset}
       >
         Reset
-      </button>
+      </Button>
     </div>
   );
 };

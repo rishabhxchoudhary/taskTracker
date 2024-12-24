@@ -18,6 +18,7 @@ import {
   Input,
   useDisclosure,
   DropdownSection,
+  CircularProgress,
 } from "@nextui-org/react";
 import { RiStickyNoteAddLine } from "react-icons/ri";
 import { DatePicker } from "@nextui-org/react";
@@ -30,12 +31,13 @@ import { Project } from "../types/types";
 import { MdDelete } from "react-icons/md";
 import { Alert } from "@nextui-org/react";
 import { useNavigate } from "react-router-dom";
-import { Howl } from 'howler';
+import { Howl } from "howler";
 import useTimerStore from "../store/timerStore";
+import { getModeColor } from "../utils/utils";
 
 const alertSound = new Howl({
-  src: ['/sounds/alarm.mp3'],
-  volume: 0.5, 
+  src: ["/sounds/alarm.mp3"],
+  volume: 0.5,
 });
 function convertTimestampToCalendarDate(unixTimestamp: number) {
   const date = new Date(unixTimestamp * 1000);
@@ -46,42 +48,63 @@ function convertTimestampToCalendarDate(unixTimestamp: number) {
 }
 
 const formatTime = (seconds: number) => {
-  const m = Math.floor(seconds / 60).toString().padStart(2, '0');
-  const s = (seconds % 60).toString().padStart(2, '0');
+  const m = Math.floor(seconds / 60)
+    .toString()
+    .padStart(2, "0");
+  const s = (seconds % 60).toString().padStart(2, "0");
   return `${m}:${s}`;
 };
 
 export function NavbarComponent() {
-  const { timeLeft, isRunning, decrementTime, mode, setMode, incrementCycle, cycle, pauseTimer } = useTimerStore();
+  const {
+    timeLeft,
+    isRunning,
+    decrementTime,
+    maxTime,
+    mode,
+    setMode,
+    incrementCycle,
+    cycle,
+    pauseTimer,
+  } = useTimerStore();
   const timerRef = React.useRef<NodeJS.Timeout | null>(null);
   React.useEffect(() => {
-      if (isRunning && timeLeft > 0) {
-        timerRef.current = setInterval(() => {
-          decrementTime();
-        }, 1000);
-      } else if (timeLeft === 0) {
-        alertSound.play();
-        pauseTimer()
-        if (Notification.permission === 'granted') {
-          new Notification(`Time for ${mode === 'work' ? 'a break!' : 'work!'}`);
-        }
-        if (mode === 'work') {
-          if ((cycle + 1) % 2 === 0) {
-            setMode('longBreak');
-          } else {
-            setMode('shortBreak');
-          }
+    if (isRunning && timeLeft > 0) {
+      timerRef.current = setInterval(() => {
+        decrementTime();
+      }, 1000);
+    } else if (timeLeft === 0) {
+      alertSound.play();
+      pauseTimer();
+      if (Notification.permission === "granted") {
+        new Notification(`Time for ${mode === "work" ? "a break!" : "work!"}`);
+      }
+      if (mode === "work") {
+        if ((cycle + 1) % 2 === 0) {
+          setMode("longBreak");
         } else {
-          setMode('work');
-          if (mode === 'shortBreak') {
-            incrementCycle();
-          }
+          setMode("shortBreak");
+        }
+      } else {
+        setMode("work");
+        if (mode === "shortBreak") {
+          incrementCycle();
         }
       }
-      return () => {
-        if (timerRef.current) clearInterval(timerRef.current);
-      };
-    }, [isRunning, timeLeft, mode, decrementTime, setMode, incrementCycle, cycle, pauseTimer]);
+    }
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [
+    isRunning,
+    timeLeft,
+    mode,
+    decrementTime,
+    setMode,
+    incrementCycle,
+    cycle,
+    pauseTimer,
+  ]);
 
   const navigate = useNavigate();
   const auth = useAuthStore((state) => state);
@@ -93,7 +116,9 @@ export function NavbarComponent() {
     onOpen: onDeleteOpen,
     onOpenChange: onDeleteClose,
   } = useDisclosure();
-  const [projectToDelete, setProjectToDelete] = React.useState<Project | null>(null);
+  const [projectToDelete, setProjectToDelete] = React.useState<Project | null>(
+    null
+  );
 
   const {
     isOpen: isCreateOpen,
@@ -131,7 +156,7 @@ export function NavbarComponent() {
   };
 
   const handleCreateProject = async () => {
-    if (newProjectName.trim() !== "" ) {
+    if (newProjectName.trim() !== "") {
       setLoading(true);
       await createProject(newProjectName, newProjectDesc);
       setProjects(await getProjects());
@@ -146,65 +171,76 @@ export function NavbarComponent() {
     <>
       <Navbar>
         <NavbarBrand>
-          <p className="font-bold text-2xl cursor-pointer"> <a onClick={()=>{
-          if (auth.user) {
-            navigate("/project");
-          } else {
-            navigate("/")
-          }
-          }}>Task Tracker</a> </p>
+          <p className="font-bold text-2xl cursor-pointer">
+            {" "}
+            <a
+              onClick={() => {
+                if (auth.user) {
+                  navigate("/project");
+                } else {
+                  navigate("/");
+                }
+              }}
+            >
+              Task Tracker
+            </a>{" "}
+          </p>
         </NavbarBrand>
 
         <NavbarContent justify="end" className="flex items-center space-x-4">
           {auth && auth.user && auth?.user?.created_at && (
-          <NavbarItem>
-            <Dropdown>
-              <DropdownTrigger>
-                <Button variant="flat" color="success">
-                  {projectStore.currentProject
-                    ? projectStore.currentProject.name
-                    : ""}
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu>
-                <DropdownSection showDivider={true} aria-label="projects">
-                  {projects.map((project: Project) => (
+            <NavbarItem>
+              <Dropdown>
+                <DropdownTrigger>
+                  <Button variant="flat" color="success">
+                    {projectStore.currentProject
+                      ? projectStore.currentProject.name
+                      : ""}
+                  </Button>
+                </DropdownTrigger>
+                <DropdownMenu>
+                  <DropdownSection showDivider={true} aria-label="projects">
+                    {projects.map((project: Project) => (
+                      <DropdownItem
+                        // className=""
+                        key={project.id}
+                        title={project.name}
+                        description={
+                          project.description?.length > 50
+                            ? project.description?.slice(0, 50) + "..."
+                            : project.description
+                        }
+                        onPress={() => projectStore.setCurrentProject(project)}
+                        endContent={
+                          <Button
+                            isIconOnly
+                            color="danger"
+                            variant="flat"
+                            onPress={() => {
+                              setProjectToDelete(project);
+                              onDeleteOpen();
+                            }}
+                          >
+                            <MdDelete className="w-4 h-4 " />
+                          </Button>
+                        }
+                      />
+                    ))}
+                  </DropdownSection>
+
+                  <DropdownSection aria-label="create-new-project">
                     <DropdownItem
                       // className=""
-                      key={project.id}
-                      title={project.name}
-                      description={project.description?.length > 50 ? project.description?.slice(0, 50) + "..." : project.description}
-                      onPress={() => projectStore.setCurrentProject(project)}
-                      endContent={
-                        <Button
-                          isIconOnly
-                          color="danger"
-                          variant="flat"
-                          onPress={() => {
-                            setProjectToDelete(project);
-                            onDeleteOpen();
-                          }}
-                        >
-                          <MdDelete className="w-4 h-4 " />
-                        </Button>
-                      }
+                      key="create-new"
+                      startContent={<RiStickyNoteAddLine />}
+                      title="Create New Project"
+                      onPress={() => onCreateOpen()}
                     />
-                  ))}
-                </DropdownSection>
-
-                <DropdownSection aria-label="create-new-project">
-                  <DropdownItem
-                    // className=""
-                    key="create-new"
-                    startContent={<RiStickyNoteAddLine />}
-                    title="Create New Project"
-                    onPress={() => onCreateOpen()}
-                  />
-                </DropdownSection>
-              </DropdownMenu>
-            </Dropdown>
-          </NavbarItem>
-        )}
+                  </DropdownSection>
+                </DropdownMenu>
+              </Dropdown>
+            </NavbarItem>
+          )}
           {auth && auth.user && auth?.user?.created_at && (
             <NavbarItem>
               <DatePicker
@@ -254,9 +290,14 @@ export function NavbarComponent() {
                 </DropdownMenu>
               </Dropdown>
             ) : (
-              <Button as={Link} color="primary" onPress={()=>{
-                navigate("/login")
-              }} variant="flat">
+              <Button
+                as={Link}
+                color="primary"
+                onPress={() => {
+                  navigate("/login");
+                }}
+                variant="flat"
+              >
                 Log In
               </Button>
             )}
@@ -264,7 +305,21 @@ export function NavbarComponent() {
           <Link href="https://forms.gle/obmjKxBUyYGCe9Xd7">Feedback</Link>
           {isRunning && (
             <NavbarItem>
-            {formatTime(timeLeft)}
+              <CircularProgress
+                aria-label="Timer Progress"
+                classNames={{
+                  svg: "drop-shadow-md m-10",
+                  indicator: `stroke-${getModeColor(mode)}`,
+                  track: `stroke-white/10`,
+                  value: `text-${getModeColor(
+                    mode
+                  )} font-semibold drop-shadow-md`,
+                }}
+                showValueLabel={true}
+                strokeWidth={1}
+                value={(timeLeft/maxTime)*100}
+                valueLabel={formatTime(timeLeft)}
+              />
             </NavbarItem>
           )}
         </NavbarContent>
@@ -292,7 +347,11 @@ export function NavbarComponent() {
                 <Button color="primary" onPress={onClose}>
                   Cancel
                 </Button>
-                <Button isLoading={loading} color="danger" onPress={handleDeleteProject}>
+                <Button
+                  isLoading={loading}
+                  color="danger"
+                  onPress={handleDeleteProject}
+                >
                   Delete
                 </Button>
               </ModalFooter>
@@ -329,9 +388,7 @@ export function NavbarComponent() {
                   color="success"
                   onPress={handleCreateProject}
                   isLoading={loading}
-                  isDisabled={
-                    newProjectName.trim() === ""
-                  }
+                  isDisabled={newProjectName.trim() === ""}
                 >
                   Create
                 </Button>
@@ -340,7 +397,6 @@ export function NavbarComponent() {
           )}
         </ModalContent>
       </Modal>
-
     </>
   );
 }

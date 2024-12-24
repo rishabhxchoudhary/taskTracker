@@ -7,10 +7,12 @@ const useTimerStore = create(persist<TimerState>(
   mode: 'work',
   timeLeft: 25 * 60,
   isRunning: false,
+  maxTime: 25 * 60,
   cycle: 0,
   setMode: (mode) => set(() => ({
     mode,
     timeLeft: mode === 'work' ? 25 * 60 : mode === 'shortBreak' ? 5 * 60 : 15 * 60,
+    maxTime: mode === 'work' ? 25 * 60 : mode === 'shortBreak' ? 5 * 60 : 15 * 60,
   })),
   startTimer: () => set({ isRunning: true }),
   pauseTimer: () => set({ isRunning: false }),
