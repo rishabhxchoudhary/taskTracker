@@ -12,6 +12,7 @@ const Controls: React.FC = () => {
 
   const handleStart = () => {
     startTimer();
+    stopAllSounds();
     buttonSound.play();
   };
 

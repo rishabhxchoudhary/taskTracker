@@ -9,7 +9,7 @@ const alertSound = new Howl({
 
 
 const Timer: React.FC = () => {
-  const { timeLeft, isRunning, decrementTime, mode, setMode, incrementCycle, cycle } = useTimerStore();
+  const { timeLeft, isRunning, decrementTime, mode, setMode, incrementCycle, cycle, pauseTimer } = useTimerStore();
     //   @ts-expect-error "nodejs not found."
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -20,6 +20,7 @@ const Timer: React.FC = () => {
       }, 1000);
     } else if (timeLeft === 0) {
       alertSound.play();
+      pauseTimer()
       if (Notification.permission === 'granted') {
         new Notification(`Time for ${mode === 'work' ? 'a break!' : 'work!'}`);
       }
