@@ -261,6 +261,7 @@ export function NavbarComponent() {
               </Button>
             )}
           </NavbarItem>
+          <Link href="https://forms.gle/obmjKxBUyYGCe9Xd7">Feedback</Link>
           {isRunning && (
             <NavbarItem>
             {formatTime(timeLeft)}
@@ -339,6 +340,7 @@ export function NavbarComponent() {
           )}
         </ModalContent>
       </Modal>
+
     </>
   );
 }
