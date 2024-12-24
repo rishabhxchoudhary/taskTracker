@@ -18,7 +18,7 @@ export function getModeColor(mode: "work" | "shortBreak" | "longBreak") {
     return "danger"
   } else if (mode=="shortBreak") {
     return "warning"
-  } else {
+  } else if (mode=="longBreak") {
     return "success"
   }
 }
