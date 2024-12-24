@@ -35,7 +35,7 @@ import { Howl } from 'howler';
 import useTimerStore from "../store/timerStore";
 
 const alertSound = new Howl({
-  src: ['../../assets/sounds/alarm.mp3'],
+  src: ['/sounds/alarm.mp3'],
   volume: 0.5, 
 });
 function convertTimestampToCalendarDate(unixTimestamp: number) {

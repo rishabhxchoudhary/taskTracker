@@ -3,7 +3,7 @@ import { Howl } from 'howler';
 import useTimerStore from '../../store/timerStore';
 
 const buttonSound = new Howl({
-  src: ['../../assets/sounds/button.wav'],
+  src: ['/sounds/button.wav'],
   volume: 0.5, 
 });
 
