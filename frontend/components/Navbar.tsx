@@ -146,7 +146,13 @@ export function NavbarComponent() {
     <>
       <Navbar>
         <NavbarBrand>
-          <p className="font-bold text-2xl cursor-pointer"> <a onClick={()=>{navigate("/")}}>Task Tracker</a> </p>
+          <p className="font-bold text-2xl cursor-pointer"> <a onClick={()=>{
+          if (auth.user) {
+            navigate("/project");
+          } else {
+            navigate("/")
+          }
+          }}>Task Tracker</a> </p>
         </NavbarBrand>
 
         <NavbarContent justify="end" className="flex items-center space-x-4">
