@@ -4,7 +4,7 @@ import "./index.css";
 import { NextUIProvider } from "@nextui-org/react";
 import { BrowserRouter, Route, Routes } from "react-router";
 import LoginPage from "../pages/LoginPage.tsx";
-import Register from "../pages/RegisterPage.tsx";
+// import Register from "../pages/RegisterPage.tsx";
 import { AuthProvider } from "../hooks/AuthContext.tsx";
 import RequireAuth from "../layouts/RequireAuth.tsx";
 import { GoogleOAuthProvider } from "@react-oauth/google";
@@ -36,7 +36,7 @@ createRoot(document.getElementById("root")!).render(
                 }
               />
               <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<Register />} />
+              {/* <Route path="/register" element={<Register />} /> */}
               <Route path="/" element={<Home />} />
               {/* <Route path="/board/:taskid" element={<Board />} /> */}
             </Routes>

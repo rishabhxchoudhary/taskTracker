@@ -1,29 +1,28 @@
-import { useEffect } from "react";
 import {
   Card,
-  CardHeader,
-  CardFooter,
-  Button,
-  Link,
-  Input,
+  // CardHeader,
+  // CardFooter,
+  // Button,
+  // Link,
+  // Input,
   CardBody,
 } from "@nextui-org/react";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 // import { useAuth } from "../hooks/AuthContext";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
-import Layout  from "../layouts/Layout2";
+import Layout  from "../layouts/Layout";
 import { GoogleJWT } from "../types/types";
 import { googleLogin } from "../src/api/auth";
 import { useAuthStore } from "../store/authStore";
-// import React from "react";
+import React from "react";
 import { toast } from "sonner";
 
 export default function Login() {
   const navigate = useNavigate();
   const auth = useAuthStore((state)=> state)
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (auth?.user) {
       navigate("/");
     }
@@ -42,18 +41,18 @@ export default function Login() {
     }
   };
 
-  const loginFunction = async ()=>{
+  // const loginFunction = async ()=>{
     
-  }
+  // }
 
   return (
     <Layout>
-      <div className="flex flex-col h-screen justify-center items-center bg-gray-100 dark:bg-gray-900">
+      <div className="flex flex-col justify-center items-center ">
         <Card className="w-full max-w-md">
-          <CardHeader>
-            <div className="text-2xl text-center">Login</div>
-          </CardHeader>
-          <CardBody className="space-y-4 p-4">
+          {/* <CardHeader>
+            <div className="text-2xl text-center">Login with Google</div>
+          </CardHeader> */}
+          {/* <CardBody className="space-y-4 p-4">
             <div className="space-y-2">
               <label htmlFor="email">Email</label>
               <Input
@@ -78,16 +77,16 @@ export default function Login() {
             <Link href="#" className="text-sm text-center">
               Forgot Password?
             </Link>
-          </CardFooter>
+          </CardFooter> */}
           <CardBody>
             <GoogleLogin onSuccess={loginWithGoogle} />
           </CardBody>
         </Card>
 
-        <div className="mt-4">
+        {/* <div className="mt-4">
           <span className="text-sm">Don't have an account? </span>
           <Link href="/register">Sign up</Link>
-        </div>
+        </div> */}
       </div>
     </Layout>
   );

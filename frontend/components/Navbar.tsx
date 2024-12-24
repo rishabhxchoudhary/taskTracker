@@ -248,7 +248,9 @@ export function NavbarComponent() {
                 </DropdownMenu>
               </Dropdown>
             ) : (
-              <Button as={Link} color="primary" href="/login" variant="flat">
+              <Button as={Link} color="primary" onPress={()=>{
+                navigate("/login")
+              }} variant="flat">
                 Log In
               </Button>
             )}
