@@ -24,12 +24,11 @@ import { DatePicker } from "@nextui-org/react";
 import { getLocalTimeZone, today, CalendarDate } from "@internationalized/date";
 import { useAuthStore } from "../store/authStore";
 import { useProjectStore } from "../store/projectStore";
-import { useEffect, useRef, useState } from "react";
+import React from "react";
 import { createProject, deleteProject, getProjects } from "../src/api/project";
 import { Project } from "../types/types";
 import { MdDelete } from "react-icons/md";
 import { Alert } from "@nextui-org/react";
-// import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Howl } from 'howler';
 import useTimerStore from "../store/timerStore";
@@ -54,8 +53,8 @@ const formatTime = (seconds: number) => {
 
 export function NavbarComponent() {
   const { timeLeft, isRunning, decrementTime, mode, setMode, incrementCycle, cycle, pauseTimer } = useTimerStore();
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-  useEffect(() => {
+  const timerRef = React.useRef<NodeJS.Timeout | null>(null);
+  React.useEffect(() => {
       if (isRunning && timeLeft > 0) {
         timerRef.current = setInterval(() => {
           decrementTime();
@@ -87,24 +86,24 @@ export function NavbarComponent() {
   const navigate = useNavigate();
   const auth = useAuthStore((state) => state);
   const projectStore = useProjectStore((state) => state);
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [projects, setProjects] = React.useState<Project[]>([]);
+  const [loading, setLoading] = React.useState(false);
   const {
     isOpen: isDeleteOpen,
     onOpen: onDeleteOpen,
     onOpenChange: onDeleteClose,
   } = useDisclosure();
-  const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
+  const [projectToDelete, setProjectToDelete] = React.useState<Project | null>(null);
 
   const {
     isOpen: isCreateOpen,
     onOpen: onCreateOpen,
     onOpenChange: onCreateClose,
   } = useDisclosure();
-  const [newProjectName, setNewProjectName] = useState<string>("");
-  const [newProjectDesc, setNewProjectDescription] = useState<string>("");
+  const [newProjectName, setNewProjectName] = React.useState<string>("");
+  const [newProjectDesc, setNewProjectDescription] = React.useState<string>("");
 
-  useEffect(() => {
+  React.useEffect(() => {
     const getUserProjects = async () => {
       const projects1: Project[] = await getProjects();
       setProjects(projects1);
