@@ -139,3 +139,15 @@ func DeleteUser(id string) error {
 
 	return nil
 }
+
+func UpdateUserAvatar(id primitive.ObjectID, avatar string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	update := bson.M{
+		"$set": bson.M{
+			"avatar": avatar,
+		},
+	}
+	_, err := GetUserCollection().UpdateOne(ctx, bson.M{"_id": id}, update)
+	return err
+}

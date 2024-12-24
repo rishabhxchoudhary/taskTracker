@@ -20,6 +20,7 @@ func GenerateJWT(user models.User) (string, error) {
 		"user_id":    user.ID,
 		"email":      user.Email,
 		"name":       user.Name,
+		"avatar":     user.Avatar,
 		"created_at": user.CreatedAt,
 		"exp":        time.Now().Add(time.Hour * 72).Unix(),
 	}
@@ -38,6 +39,7 @@ func GoogleLogin(w http.ResponseWriter, r *http.Request) {
 		newUser := models.User{
 			Name:      body.Name,
 			Email:     body.Email,
+			Avatar:    body.Avatar,
 			CreatedAt: time.Now().Unix(),
 		}
 		user, err = database.CreateUser(newUser)
@@ -46,6 +48,12 @@ func GoogleLogin(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	// Update the user's avatar in the database
+	if err := database.UpdateUserAvatar(user.ID, body.Avatar); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	user.Avatar = body.Avatar
 	token, err := GenerateJWT(user)
 	if err != nil {
 		http.Error(w, "Failed to generate token", http.StatusInternalServerError)
@@ -102,6 +110,7 @@ func GetUserFromJWT(r *http.Request) (models.User, error) {
 		user.CreatedAt = int64(claims["created_at"].(float64))
 		user.Name = claims["name"].(string)
 		user.Email = claims["email"].(string)
+		user.Avatar = claims["avatar"].(string)
 		return user, nil
 	}
 	return user, fmt.Errorf("unauthorized: invalid token claims")

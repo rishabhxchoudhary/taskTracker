@@ -142,6 +142,7 @@ export function NavbarComponent() {
 
   const navigate = useNavigate();
   const auth = useAuthStore((state) => state);
+  console.log("auth", auth)
   const projectStore = useProjectStore((state) => state);
   const [projects, setProjects] = React.useState<Project[]>([]);
   const [loading, setLoading] = React.useState(false);
