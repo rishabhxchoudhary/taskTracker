@@ -25,6 +25,7 @@ const Controls: React.FC = () => {
   const handleReset = () => {
     resetTimer();
     stopAllSounds();
+    buttonSound.play();
   };
 
   const stopAllSounds = () => {
