@@ -1,4 +1,3 @@
-import  { useCallback, useEffect, useState } from "react";
 import { Excalidraw, MainMenu, WelcomeScreen } from "@excalidraw/excalidraw";
 import { ExcalidrawElement } from "@excalidraw/excalidraw/types/element/types";
 import { setBoardData } from "../src/api/task";
@@ -12,11 +11,11 @@ import React from "react";
 const Canvas = ({ initialData }: { initialData: string }) => {
   const params = useParams(); // Fixed typo from 'prams' to 'params'
   const taskId = params.taskid;
-  const [whiteBoard, setWhiteBoard] = useState<
+  const [whiteBoard, setWhiteBoard] = React.useState<
     readonly ExcalidrawElement[] | null
   >([]);
 
-  const saveData = useCallback(async () => {
+  const saveData = React.useCallback(async () => {
     if (!taskId) return;
     const finalElements = whiteBoard?.filter((element: ExcalidrawElement) => !element.isDeleted);
     if (!finalElements) return;
@@ -28,7 +27,7 @@ const Canvas = ({ initialData }: { initialData: string }) => {
     }
   }, [taskId, whiteBoard]);
 
-  const debouncedSaveData = useCallback(debounce(saveData, 1000), [saveData]);
+  const debouncedSaveData = React.useCallback(debounce(saveData, 1000), [saveData]);
 
 
   useDeepCompareEffect(() => {
@@ -39,7 +38,7 @@ const Canvas = ({ initialData }: { initialData: string }) => {
   }, [debouncedSaveData, whiteBoard]); 
 
 
-  const handleKeyDown = useCallback(
+  const handleKeyDown = React.useCallback(
     (event: KeyboardEvent) => {
       const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
       const isSaveShortcut = isMac
@@ -54,7 +53,7 @@ const Canvas = ({ initialData }: { initialData: string }) => {
     [saveData]
   );
 
-  useEffect(() => {
+  React.useEffect(() => {
     // Attach the event listener
     window.addEventListener("keydown", handleKeyDown);
     return () => {
@@ -63,7 +62,7 @@ const Canvas = ({ initialData }: { initialData: string }) => {
   }, [handleKeyDown]);
 
 
-  const handleGenerateLink = useCallback(
+  const handleGenerateLink = React.useCallback(
     async (access: 'view' | 'edit') => {
       if (!taskId) {
         toast.error("Task ID is missing.");
