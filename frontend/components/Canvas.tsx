@@ -6,6 +6,7 @@ import { useParams } from "react-router-dom";
 import debounce from "lodash/debounce";
 import useDeepCompareEffect from "use-deep-compare-effect";
 import { toast } from "sonner";
+import { Button } from "@nextui-org/react";
 
 const Canvas = ({ initialData }: { initialData: string }) => {
   const params = useParams(); // Fixed typo from 'prams' to 'params'
@@ -59,6 +60,36 @@ const Canvas = ({ initialData }: { initialData: string }) => {
     };
   }, [handleKeyDown]);
 
+
+  const handleGenerateLink = useCallback(
+    async (access: 'view' | 'edit') => {
+      if (!taskId) {
+        toast.error("Task ID is missing.");
+        return;
+      }
+      console.log("access", access);
+
+      // try {
+      //   const expiresIn = 24; // Link expires in 24 hours
+      //   const link = await generatePublicLink(taskId, access, expiresIn);
+      //   navigator.clipboard.writeText(link)
+      //     .then(() => {
+      //       toast.success(`${access === "view" ? "View" : "Edit"} link copied to clipboard!`);
+      //       setPublicLink(link);
+      //     })
+      //     .catch((err) => {
+      //       console.error("Failed to copy link: ", err);
+      //       toast.error("Failed to copy link.");
+      //     });
+      // } catch (error) {
+      //   console.error("Error generating link:", error);
+      //   toast.error("Failed to generate link.");
+      // }
+    },
+    [taskId]
+  );
+
+
   return (
     <div id="whiteboard" style={{ height: "93vh", position: "relative" }}>
       <Excalidraw
@@ -85,9 +116,14 @@ const Canvas = ({ initialData }: { initialData: string }) => {
           <MainMenu.DefaultItems.SaveAsImage />
           <MainMenu.DefaultItems.ClearCanvas />
           <MainMenu.DefaultItems.Help />
-          {/* <MainMenu.ItemCustom>
-            <div>Custom Item</div>
-        </MainMenu.ItemCustom> */}
+          <MainMenu.ItemCustom>
+            <Button size="sm" onPress={() => handleGenerateLink("view")}>
+              Get Public View Link
+            </Button>
+            <Button size="sm" onPress={() => handleGenerateLink("edit")}>
+              Get Public Edit Link
+            </Button>
+          </MainMenu.ItemCustom>
           <MainMenu.DefaultItems.ChangeCanvasBackground />
         </MainMenu>
         <WelcomeScreen>
