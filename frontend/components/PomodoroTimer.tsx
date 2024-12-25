@@ -35,7 +35,7 @@ const App: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-[70vh] flex flex-col items-center justify-center">
+    <div id="timer" className="min-h-[70vh] flex flex-col items-center justify-center">
       <Tabs color={getModeColor(mode)} selectedKey={mode} 
       // @ts-expect-error " "
       onSelectionChange={(e)=>{setMode(e); pauseTimer()}} size="lg" aria-label="Dynamic tabs" variant="underlined" items={tabs}>

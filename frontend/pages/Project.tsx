@@ -43,7 +43,7 @@ const Project = () => {
   
   return (
     <Layout>
-      <Tabs selectedKey={project.selectedTab} onSelectionChange={project.setSelectedTab} aria-label="Dynamic tabs" items={tabs}>
+      <Tabs id="tabs" selectedKey={project.selectedTab} onSelectionChange={project.setSelectedTab} aria-label="Dynamic tabs" items={tabs}>
         {(item) => (
           <Tab key={item.id} title={item.label}>
             {item.content}

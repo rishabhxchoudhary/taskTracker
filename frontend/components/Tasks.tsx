@@ -492,7 +492,7 @@ const Tasks = ({ tasks, project, setTasks }) => {
 
   return (
     <>
-      <div className="mt-2">
+      <div id="taskstable" className="mt-2">
         <Table
           selectionMode="single"
           isHeaderSticky

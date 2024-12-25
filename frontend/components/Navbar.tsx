@@ -38,6 +38,7 @@ import { googleLogin } from "../src/api/auth";
 import { toast } from "sonner";
 import axios from "axios";
 import { Project } from "../types/types";
+import { useTour } from '@reactour/tour'
 
 const googlecallback = async (token) => {
   const googleRes = await axios.get(
@@ -75,6 +76,7 @@ const formatTime = (seconds: number) => {
 };
 
 export function NavbarComponent() {
+  const { setIsOpen } = useTour()
   const {
     timeLeft,
     isRunning,
@@ -223,7 +225,7 @@ export function NavbarComponent() {
 
         <NavbarContent justify="end" className="flex items-center space-x-4">
           {auth && auth.user && auth?.user?.created_at && (
-            <NavbarItem>
+            <NavbarItem id="projects">
               <Dropdown>
                 <DropdownTrigger>
                   <Button variant="flat" color="success">
@@ -264,7 +266,6 @@ export function NavbarComponent() {
 
                   <DropdownSection aria-label="create-new-project">
                     <DropdownItem
-                      // className=""
                       key="create-new"
                       startContent={<RiStickyNoteAddLine />}
                       title="Create New Project"
@@ -356,6 +357,9 @@ export function NavbarComponent() {
                 Log in with Google
               </Button>
             )}
+          </NavbarItem>
+          <NavbarItem>
+            <Button onPress={() => setIsOpen(true)}>Open Tour</Button>
           </NavbarItem>
       </Navbar>
 

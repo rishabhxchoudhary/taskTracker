@@ -102,7 +102,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, setTasks }) => {
     };
 
     return (
-        <div className="flex flex-col">
+        <div id="kanbanboard" className="flex flex-col">
             <DragDropContext onDragEnd={onDragEnd}>
                 <div className="flex flex-1 space-x-4 p-4 overflow-auto">
                     {Object.entries(columns).map(([columnId, tasks]) => (
