@@ -4,6 +4,7 @@ import (
 	"backend/database"
 	"backend/models"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -45,4 +46,34 @@ func GenerateLink(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(publicLink)
+}
+
+type ValidateLinkBody struct {
+	ID primitive.ObjectID `json:"id"`
+}
+
+func ValidateLink(w http.ResponseWriter, r *http.Request) {
+	var body ValidateLinkBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	publicLink, err := database.GetPublicLink(body.ID)
+	fmt.Println("publicLink", publicLink)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if publicLink.ExpiresAt != 0 && publicLink.ExpiresAt < time.Now().Unix() {
+		http.Error(w, "Link has expired", http.StatusUnauthorized)
+		return
+	}
+	taskId := publicLink.TaskID
+	initialData, err := database.GetBoardData(taskId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(initialData)
 }

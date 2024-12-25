@@ -12,6 +12,7 @@ import Home from "../pages/Home.tsx";
 import Project from "../pages/Project.tsx";
 import TaskPage from "../pages/TaskPage.tsx";
 import { LayoutWrapper } from "../layouts/LayoutWrapper.tsx";
+import PublicBoard from "../pages/PublicBoard.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -34,6 +35,7 @@ createRoot(document.getElementById("root")!).render(
               <Route path="/login" element={<LoginPage />} />
               {/* <Route path="/register" element={<Register />} /> */}
               <Route path="/" element={<Home />} />
+              <Route path="/:boardId" element={<PublicBoard />} />
               {/* <Route path="/board/:taskid" element={<Board />} /> */}
             </Routes>
           </BrowserRouter>

@@ -51,6 +51,7 @@ func NewRouter() *mux.Router {
 	taskRouter.HandleFunc("/board/{id}", handlers.SetBoardData).Methods("POST")
 	
 	taskRouter.HandleFunc("/generate_link", handlers.GenerateLink).Methods("POST")
+	taskRouter.HandleFunc("/validate_link", handlers.ValidateLink).Methods("POST")
 
 	return r
 }

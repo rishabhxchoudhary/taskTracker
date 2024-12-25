@@ -9,3 +9,10 @@ export const getAccessLink = async (taskId: string,projectId: string, access: "v
     });
     return data.data;
 }
+
+export const validatePublicLink = async (id: string): Promise<string> => {
+    const data = await client.post(`/task/validate_link`, {
+        id: id
+    });
+    return data.data;
+}
