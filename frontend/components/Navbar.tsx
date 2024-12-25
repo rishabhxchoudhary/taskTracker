@@ -222,7 +222,7 @@ export function NavbarComponent() {
         onMenuOpenChange={setIsMenuOpen}
       >
         <NavbarBrand>
-          <span className="ml-2 text-small font-medium">
+          <span className="ml-2 text-small font-medium cursor-pointer">
             <a
               onClick={() => {
                 if (auth.user) {
@@ -334,6 +334,7 @@ export function NavbarComponent() {
             </NavbarItem>
           )}
           {auth && auth.user ? (
+            <>
             <NavbarItem>
               <Dropdown placement="bottom-end">
                 <DropdownTrigger>
@@ -365,6 +366,10 @@ export function NavbarComponent() {
                 </DropdownMenu>
               </Dropdown>
             </NavbarItem>
+            <NavbarItem>
+            <Button onPress={() => setIsOpen(true)}>Open Tour</Button>
+          </NavbarItem>
+          </>
           ) : (
             <>
               <NavbarItem>
@@ -378,9 +383,6 @@ export function NavbarComponent() {
                 >
                   Log in with Google
                 </Button>
-              </NavbarItem>
-              <NavbarItem>
-                <Button onPress={() => setIsOpen(true)}>Open Tour</Button>
               </NavbarItem>
             </>
           )}
@@ -486,6 +488,7 @@ export function NavbarComponent() {
             </NavbarMenuItem>
           )}
           {auth && auth.user ? (
+            <>
             <NavbarMenuItem>
               <Dropdown placement="bottom-end">
                 <DropdownTrigger>
@@ -517,6 +520,10 @@ export function NavbarComponent() {
                 </DropdownMenu>
               </Dropdown>
             </NavbarMenuItem>
+             <NavbarMenuItem>
+             <Button onPress={() => {setIsMenuOpen(false);setIsOpen(true)}}>Open Tour</Button>
+           </NavbarMenuItem>
+           </>
           ) : (
             <>
               <NavbarMenuItem>
@@ -530,9 +537,6 @@ export function NavbarComponent() {
                 >
                   Log in with Google
                 </Button>
-              </NavbarMenuItem>
-              <NavbarMenuItem>
-                <Button onPress={() => setIsOpen(true)}>Open Tour</Button>
               </NavbarMenuItem>
             </>
           )}
