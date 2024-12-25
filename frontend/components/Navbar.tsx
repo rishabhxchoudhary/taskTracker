@@ -19,6 +19,10 @@ import {
   useDisclosure,
   DropdownSection,
   CircularProgress,
+  cn,
+  NavbarMenuToggle,
+  NavbarMenu,
+  NavbarMenuItem,
 } from "@nextui-org/react";
 import { RiStickyNoteAddLine } from "react-icons/ri";
 import { DatePicker } from "@nextui-org/react";
@@ -38,7 +42,7 @@ import { googleLogin } from "../src/api/auth";
 import { toast } from "sonner";
 import axios from "axios";
 import { Project } from "../types/types";
-import { useTour } from '@reactour/tour'
+import { useTour } from "@reactour/tour";
 
 const googlecallback = async (token) => {
   const googleRes = await axios.get(
@@ -52,7 +56,7 @@ const googlecallback = async (token) => {
       },
     }
   );
-  return googleRes.data
+  return googleRes.data;
 };
 
 const alertSound = new Howl({
@@ -76,7 +80,7 @@ const formatTime = (seconds: number) => {
 };
 
 export function NavbarComponent() {
-  const { setIsOpen } = useTour()
+  const { setIsOpen } = useTour();
   const {
     timeLeft,
     isRunning,
@@ -101,7 +105,7 @@ export function NavbarComponent() {
       auth?.login(data);
       navigate("/project");
       toast.success("Logged In Successfully");
-    }
+    },
   });
 
   React.useEffect(() => {
@@ -202,13 +206,24 @@ export function NavbarComponent() {
       setLoading(false);
     }
   };
+  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
   return (
     <>
-      <Navbar>
+      <Navbar
+        classNames={{
+          base: cn("border-default-100", {
+            "bg-default-200/50 dark:bg-default-100/50": isMenuOpen,
+          }),
+          wrapper: "w-full justify-center",
+          item: "hidden md:flex",
+        }}
+        height="60px"
+        isMenuOpen={isMenuOpen}
+        onMenuOpenChange={setIsMenuOpen}
+      >
         <NavbarBrand>
-          <p className="font-bold text-2xl cursor-pointer">
-            {" "}
+          <span className="ml-2 text-small font-medium">
             <a
               onClick={() => {
                 if (auth.user) {
@@ -219,82 +234,86 @@ export function NavbarComponent() {
               }}
             >
               Task Tracker
-            </a>{" "}
-          </p>
+            </a>
+          </span>
         </NavbarBrand>
 
-        <NavbarContent justify="end" className="flex items-center space-x-4">
+        <NavbarContent className="hidden md:flex" justify="end">
           {auth && auth.user && auth?.user?.created_at && (
-            <NavbarItem id="projects">
-              <Dropdown>
-                <DropdownTrigger>
-                  <Button variant="flat" color="success">
-                    {projectStore.currentProject
-                      ? projectStore.currentProject.name
-                      : ""}
-                  </Button>
-                </DropdownTrigger>
-                <DropdownMenu>
-                  <DropdownSection showDivider={true} aria-label="projects">
-                    {projects.map((project: Project) => (
-                      <DropdownItem
-                        // className=""
-                        key={project.id}
-                        title={project.name}
-                        description={
-                          project.description?.length > 50
-                            ? project.description?.slice(0, 50) + "..."
-                            : project.description
-                        }
-                        onPress={() => projectStore.setCurrentProject(project)}
-                        endContent={
-                          <Button
-                            isIconOnly
-                            color="danger"
-                            variant="flat"
-                            onPress={() => {
-                              setProjectToDelete(project);
-                              onDeleteOpen();
-                            }}
-                          >
-                            <MdDelete className="w-4 h-4 " />
-                          </Button>
-                        }
-                      />
-                    ))}
-                  </DropdownSection>
+            <>
+              <NavbarItem id="projects">
+                <Dropdown>
+                  <DropdownTrigger>
+                    <Button variant="flat" color="success">
+                      {projectStore.currentProject
+                        ? projectStore.currentProject.name
+                        : ""}
+                    </Button>
+                  </DropdownTrigger>
+                  <DropdownMenu>
+                    <DropdownSection showDivider={true} aria-label="projects">
+                      {projects.map((project: Project) => (
+                        <DropdownItem
+                          // className=""
+                          key={project.id}
+                          title={project.name}
+                          description={
+                            project.description?.length > 50
+                              ? project.description?.slice(0, 50) + "..."
+                              : project.description
+                          }
+                          onPress={() =>
+                            projectStore.setCurrentProject(project)
+                          }
+                          endContent={
+                            <Button
+                              isIconOnly
+                              color="danger"
+                              variant="flat"
+                              onPress={() => {
+                                setProjectToDelete(project);
+                                onDeleteOpen();
+                              }}
+                            >
+                              <MdDelete className="w-4 h-4 " />
+                            </Button>
+                          }
+                        />
+                      ))}
+                    </DropdownSection>
 
-                  <DropdownSection aria-label="create-new-project">
-                    <DropdownItem
-                      key="create-new"
-                      startContent={<RiStickyNoteAddLine />}
-                      title="Create New Project"
-                      onPress={() => onCreateOpen()}
-                    />
-                  </DropdownSection>
-                </DropdownMenu>
-              </Dropdown>
-            </NavbarItem>
-          )}
-          {auth && auth.user && auth?.user?.created_at && (
-            <NavbarItem>
-              <DatePicker
-                defaultValue={today(getLocalTimeZone())}
-                minValue={convertTimestampToCalendarDate(
-                  projectStore?.currentProject?.created_at || 0
-                )}
-                maxValue={today(getLocalTimeZone())}
-                aria-label="Select a date"
-                onChange={(date) => {
-                  if (date) {
-                    projectStore.setCurrentDate(date as CalendarDate);
-                  }
-                }}
-              />
-            </NavbarItem>
+                    <DropdownSection aria-label="create-new-project">
+                      <DropdownItem
+                        key="create-new"
+                        startContent={<RiStickyNoteAddLine />}
+                        title="Create New Project"
+                        onPress={() => onCreateOpen()}
+                      />
+                    </DropdownSection>
+                  </DropdownMenu>
+                </Dropdown>
+              </NavbarItem>
+              <NavbarItem>
+                <DatePicker
+                  defaultValue={today(getLocalTimeZone())}
+                  minValue={convertTimestampToCalendarDate(
+                    projectStore?.currentProject?.created_at || 0
+                  )}
+                  maxValue={today(getLocalTimeZone())}
+                  aria-label="Select a date"
+                  onChange={(date) => {
+                    if (date) {
+                      projectStore.setCurrentDate(date as CalendarDate);
+                    }
+                  }}
+                />
+              </NavbarItem>
+            </>
           )}
           <NavbarItem>
-            <Link color="success" href="https://forms.gle/obmjKxBUyYGCe9Xd7">Feedback Link</Link>
+            <Link color="success" href="https://forms.gle/obmjKxBUyYGCe9Xd7">
+              Feedback Link
+            </Link>
           </NavbarItem>
           {isRunning && (
             <NavbarItem>
@@ -310,14 +329,13 @@ export function NavbarComponent() {
                 }}
                 showValueLabel={true}
                 strokeWidth={1}
-                value={(timeLeft/maxTime)*100}
+                value={(timeLeft / maxTime) * 100}
                 valueLabel={formatTime(timeLeft)}
               />
             </NavbarItem>
           )}
-        </NavbarContent>
-        <NavbarItem>
-            {auth && auth.user ? (
+          {auth && auth.user ? (
+            <NavbarItem>
               <Dropdown placement="bottom-end">
                 <DropdownTrigger>
                   <Avatar
@@ -347,22 +365,180 @@ export function NavbarComponent() {
                   </DropdownItem>
                 </DropdownMenu>
               </Dropdown>
-            ) : (
-              <Button
-                as={Link}
-                color="primary"
-                onPress={()=>{loginClick()}}
-                variant="flat"
-              >
-                Log in with Google
-              </Button>
-            )}
-          </NavbarItem>
-          {auth && auth.user && 
-          <NavbarItem>
-            <Button onPress={() => setIsOpen(true)}>Open Tour</Button>
-          </NavbarItem>
-          }
+            </NavbarItem>
+          ) : (
+            <>
+              <NavbarItem>
+                <Button
+                  as={Link}
+                  color="primary"
+                  onPress={() => {
+                    loginClick();
+                  }}
+                  variant="flat"
+                >
+                  Log in with Google
+                </Button>
+              </NavbarItem>
+              <NavbarItem>
+                <Button onPress={() => setIsOpen(true)}>Open Tour</Button>
+              </NavbarItem>
+            </>
+          )}
+        </NavbarContent>
+
+        <NavbarMenuToggle className="text-default-400 md:hidden" />
+
+        <NavbarMenu className="top-[calc(var(--navbar-height)_-_1px)] max-h-fit bg-default-200/50 pb-6 pt-6 shadow-medium backdrop-blur-md backdrop-saturate-150 dark:bg-default-100/50">
+          
+          {auth && auth.user && auth?.user?.created_at && (
+            <>
+              <NavbarMenuItem id="projects">
+                <Dropdown>
+                  <DropdownTrigger>
+                    <Button variant="flat" color="success">
+                      {projectStore.currentProject
+                        ? projectStore.currentProject.name
+                        : ""}
+                    </Button>
+                  </DropdownTrigger>
+                  <DropdownMenu>
+                    <DropdownSection showDivider={true} aria-label="projects">
+                      {projects.map((project: Project) => (
+                        <DropdownItem
+                          // className=""
+                          key={project.id}
+                          title={project.name}
+                          description={
+                            project.description?.length > 50
+                              ? project.description?.slice(0, 50) + "..."
+                              : project.description
+                          }
+                          onPress={() =>
+                            projectStore.setCurrentProject(project)
+                          }
+                          endContent={
+                            <Button
+                              isIconOnly
+                              color="danger"
+                              variant="flat"
+                              onPress={() => {
+                                setProjectToDelete(project);
+                                onDeleteOpen();
+                              }}
+                            >
+                              <MdDelete className="w-4 h-4 " />
+                            </Button>
+                          }
+                        />
+                      ))}
+                    </DropdownSection>
+
+                    <DropdownSection aria-label="create-new-project">
+                      <DropdownItem
+                        key="create-new"
+                        startContent={<RiStickyNoteAddLine />}
+                        title="Create New Project"
+                        onPress={() => onCreateOpen()}
+                      />
+                    </DropdownSection>
+                  </DropdownMenu>
+                </Dropdown>
+              </NavbarMenuItem>
+              <NavbarMenuItem>
+                <DatePicker
+                  defaultValue={today(getLocalTimeZone())}
+                  minValue={convertTimestampToCalendarDate(
+                    projectStore?.currentProject?.created_at || 0
+                  )}
+                  maxValue={today(getLocalTimeZone())}
+                  aria-label="Select a date"
+                  onChange={(date) => {
+                    if (date) {
+                      projectStore.setCurrentDate(date as CalendarDate);
+                    }
+                  }}
+                />
+              </NavbarMenuItem>
+            </>
+          )}
+          <NavbarMenuItem>
+            <Link color="success" href="https://forms.gle/obmjKxBUyYGCe9Xd7">
+              Feedback Link
+            </Link>
+          </NavbarMenuItem>
+          {isRunning && (
+            <NavbarMenuItem>
+              <CircularProgress
+                color={getModeColor(mode)}
+                aria-label="Timer Progress"
+                classNames={{
+                  svg: "drop-shadow-md",
+                  track: `stroke-white/10`,
+                  value: `text-${getModeColor(
+                    mode
+                  )} font-semibold drop-shadow-md`,
+                }}
+                showValueLabel={true}
+                strokeWidth={1}
+                value={(timeLeft / maxTime) * 100}
+                valueLabel={formatTime(timeLeft)}
+              />
+            </NavbarMenuItem>
+          )}
+          {auth && auth.user ? (
+            <NavbarMenuItem>
+              <Dropdown placement="bottom-end">
+                <DropdownTrigger>
+                  <Avatar
+                    isBordered
+                    as="button"
+                    className="transition-transform"
+                    color="default"
+                    name={auth?.user?.username}
+                    size="sm"
+                    src={auth?.user?.avatar}
+                  />
+                </DropdownTrigger>
+                <DropdownMenu aria-label="Profile Actions" variant="flat">
+                  <DropdownItem key="profile" className="h-14 gap-2 ">
+                    <p className="font-semibold">Signed in as</p>
+                    <p className="font-semibold">{auth?.user?.username}</p>
+                    <p className="">{auth?.user?.email}</p>
+                  </DropdownItem>
+                  <DropdownItem key="logout">
+                    <Button
+                      variant="shadow"
+                      color="danger"
+                      onPress={auth?.logout}
+                    >
+                      Log Out
+                    </Button>
+                  </DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
+            </NavbarMenuItem>
+          ) : (
+            <>
+              <NavbarMenuItem>
+                <Button
+                  as={Link}
+                  color="primary"
+                  onPress={() => {
+                    loginClick();
+                  }}
+                  variant="flat"
+                >
+                  Log in with Google
+                </Button>
+              </NavbarMenuItem>
+              <NavbarMenuItem>
+                <Button onPress={() => setIsOpen(true)}>Open Tour</Button>
+              </NavbarMenuItem>
+            </>
+          )}
+          
+        </NavbarMenu>
       </Navbar>
 
       <Modal isOpen={isDeleteOpen} onOpenChange={onDeleteClose} closeButton>
