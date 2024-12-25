@@ -109,7 +109,7 @@ const Tasks = ({ tasks, project, setTasks }) => {
     const task = await createTask(
       taskTitle,
       taskDescription,
-      project.id,
+      project.currentProject?.id,
       taskPriority,
       taskDeadlineDate2
     );
