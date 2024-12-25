@@ -10,20 +10,23 @@ function Layout({ children }) {
     const [step, setStep] = React.useState(0);
     const setSelectedTab = useProjectStore((state) => state.setSelectedTab);
     const setCurrentStep = (step: number)=>{
-      if (step == 2) {
-        redirect("/project");
-        setSelectedTab("list");
-      } else if (step == 3){
-        redirect("/project/sample");
-      } else if (step == 4) {
-        redirect("/project", { replace: true });
-        setSelectedTab("kanban");
-      } else if (step == 5) {
-        setSelectedTab("pomodoro");
-      } else {
-        redirect("/project");
-      }
-      setStep(step);
+        if (step === 2) {
+          redirect("/project");
+          setSelectedTab("list");
+        } else if (step === 3) {
+          redirect("/project/sample");
+        } else if (step === 4) {
+          redirect("/project", { replace: true });
+          setSelectedTab("kanban");
+        } else if (step === 5) {
+          setSelectedTab("pomodoro");
+        } else {
+          redirect("/project");
+        }
+      setTimeout(() => {
+        setStep(step);
+      }, 50);
+      
     }
 
     const steps = [
