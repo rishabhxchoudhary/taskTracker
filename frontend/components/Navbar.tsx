@@ -213,7 +213,6 @@ export function NavbarComponent() {
       <Navbar
         classNames={{
           base: cn("border-default-100", {
-            "bg-default-200/50 dark:bg-default-100/50": isMenuOpen,
           }),
           wrapper: "w-full justify-center",
           item: "hidden md:flex",
@@ -389,7 +388,7 @@ export function NavbarComponent() {
 
         <NavbarMenuToggle className="text-default-400 md:hidden" />
 
-        <NavbarMenu className="top-[calc(var(--navbar-height)_-_1px)] max-h-fit bg-default-200/50 pb-6 pt-6 shadow-medium backdrop-blur-md backdrop-saturate-150 dark:bg-default-100/50">
+        <NavbarMenu className="top-[calc(var(--navbar-height)_-_1px)] max-h-fit  pb-6 pt-6 shadow-medium backdrop-blur-md backdrop-saturate-150">
           
           {auth && auth.user && auth?.user?.created_at && (
             <>
