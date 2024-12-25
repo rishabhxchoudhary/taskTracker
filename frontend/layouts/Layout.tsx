@@ -1,26 +1,23 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { NavbarComponent } from '../components/Navbar';
 import { Divider } from '@nextui-org/react';
 import { Toaster } from 'sonner'
 import { TourProvider } from '@reactour/tour'
 import { useProjectStore } from '../store/projectStore';
 function Layout({ children }) {
-    const [currentStep, setCurrentStep] = React.useState(0);
+    const [step, setStep] = React.useState(0);
     const setSelectedTab = useProjectStore((state) => state.setSelectedTab);
-    useEffect(()=>{
-        if (currentStep === 2) {
-            setSelectedTab("list");
-            return
-        }
-        if (currentStep === 3) {
-            setSelectedTab("kanban");
-            console.log("onboarding complete")
-        }
-        if (currentStep === 4) {
-            setSelectedTab("pomodoro");
-            console.log("onboarding complete")
-        }
-    },[currentStep, setSelectedTab])
+    const setCurrentStep = (step: number)=>{
+      if (step == 2) {
+        setSelectedTab("list");
+      } else if (step == 3) {
+        setSelectedTab("kanban");
+      } else if (step == 4) {
+        setSelectedTab("pomodoro");
+      }
+      setStep(step);
+    }
+    
     const steps = [
         {
           selector: '#projects',
@@ -57,7 +54,7 @@ function Layout({ children }) {
       ]
     return (
         <div className='flex flex-col'  style={{ minHeight: "100vh"}}>
-            <TourProvider currentStep={currentStep} setCurrentStep={setCurrentStep}  steps={steps}>
+            <TourProvider currentStep={step} setCurrentStep={setCurrentStep}  steps={steps}>
                 <Toaster/>
                 <NavbarComponent />
                 <Divider/>
