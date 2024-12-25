@@ -40,7 +40,7 @@ import { SearchIcon } from "./SearchIcon";
 import { ChevronDownIcon } from "./ChevronDownIcon";
 import { PlusIcon } from "./PlusIcon";
 import { DeleteIcon } from "./DeleteIcon";
-import { TaskInterface } from "../types/types";
+import { Project, TaskInterface } from "../types/types";
 import { EditIcon } from "./EditIcon";
 
 const INITIAL_VISIBLE_COLUMNS = [
@@ -66,7 +66,13 @@ const statusOptions = [
   { name: "Done", uid: "done" },
 ];
 
-const Tasks = ({ tasks, project, setTasks }) => {
+interface Props {
+  tasks: TaskInterface[];
+  project: Project;
+  setTasks: React.Dispatch<React.SetStateAction<TaskInterface[]>>;
+}
+
+const Tasks: React.FC<Props> = ({ tasks, project, setTasks }) => {
   const navigate = useNavigate();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [taskTitle, setTaskTitle] = React.useState("");
@@ -109,7 +115,7 @@ const Tasks = ({ tasks, project, setTasks }) => {
     const task = await createTask(
       taskTitle,
       taskDescription,
-      project.currentProject?.id,
+      project?.id,
       taskPriority,
       taskDeadlineDate2
     );
@@ -483,7 +489,7 @@ const Tasks = ({ tasks, project, setTasks }) => {
     if (!taskToDelete) return;
     if (!project) return;
     setLoading(true);
-    await deleteTask(taskToDelete.id, project.currentProject.id);
+    await deleteTask(taskToDelete.id, project?.id);
     setTasks((prev) => prev.filter((task) => task.id !== taskToDelete.id));
     toast.success("Task Deleted Successfully");
     setLoading(false);
@@ -743,7 +749,7 @@ const Tasks = ({ tasks, project, setTasks }) => {
                       color="danger"
                       className="text-danger"
                       onPress={() => {
-                        updateTaskStatus(taskToEdit.id, project.currentProject.id, "to_do");
+                        updateTaskStatus(taskToEdit.id, project?.id, "to_do");
                       }}
                       key="to_do"
                     >
@@ -755,7 +761,7 @@ const Tasks = ({ tasks, project, setTasks }) => {
                       onPress={() => {
                         updateTaskStatus(
                           taskToEdit.id,
-                          project.currentProject.id,
+                          project?.id,
                           "in_progress"
                         );
                       }}
@@ -765,7 +771,7 @@ const Tasks = ({ tasks, project, setTasks }) => {
                     </DropdownItem>
                     <DropdownItem
                       onPress={() => {
-                        updateTaskStatus(taskToEdit.id, project.currentProject.id, "done");
+                        updateTaskStatus(taskToEdit.id, project?.id, "done");
                       }}
                       color="success"
                       className="text-success"

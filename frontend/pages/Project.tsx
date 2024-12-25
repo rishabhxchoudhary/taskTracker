@@ -29,7 +29,7 @@ const Project = () => {
     {
       id: "list",
       label: "List",
-      content: <Tasks project={project} tasks={tasks} setTasks={setTasks} />,
+      content: <Tasks project={project.currentProject} tasks={tasks} setTasks={setTasks} />,
     },
     {
       id: "kanban",
