@@ -12,6 +12,10 @@ const TaskPage = () => {
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     const fetchData = async () => {
+      if (taskId == "sample") {
+        setLoading(false);
+        return;
+      };
       const data = await getBoardData(taskId);
       setInitialData(data);
       setLoading(false);

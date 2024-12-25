@@ -4,20 +4,25 @@ import { Divider } from '@nextui-org/react';
 import { Toaster } from 'sonner'
 import { TourProvider } from '@reactour/tour'
 import { useProjectStore } from '../store/projectStore';
+import {  useNavigate } from 'react-router-dom'
 function Layout({ children }) {
+    const redirect = useNavigate();
     const [step, setStep] = React.useState(0);
     const setSelectedTab = useProjectStore((state) => state.setSelectedTab);
     const setCurrentStep = (step: number)=>{
       if (step == 2) {
         setSelectedTab("list");
-      } else if (step == 3) {
-        setSelectedTab("kanban");
+      } else if (step == 3){
+        redirect("/project/sample", { replace: true });
       } else if (step == 4) {
+        redirect("/project", { replace: true });
+        setSelectedTab("kanban");
+      } else if (step == 5) {
         setSelectedTab("pomodoro");
       }
       setStep(step);
     }
-    
+
     const steps = [
         {
           selector: '#projects',
@@ -37,6 +42,12 @@ function Layout({ children }) {
           content:<div className="text-sm text-black">
             This is the task table. You can create, update, and delete tasks here.
             Click on a row to open the white board.
+          </div>,
+        },
+        {
+          selector: '#whiteboard',
+          content:<div className="text-sm text-black">
+            This is the white board. You can draw here.
           </div>,
         },
         {
