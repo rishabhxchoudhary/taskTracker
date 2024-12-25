@@ -7,6 +7,7 @@ import debounce from "lodash/debounce";
 import useDeepCompareEffect from "use-deep-compare-effect";
 import { toast } from "sonner";
 import { Button } from "@nextui-org/react";
+import React from "react";
 
 const Canvas = ({ initialData }: { initialData: string }) => {
   const params = useParams(); // Fixed typo from 'prams' to 'params'
@@ -18,6 +19,7 @@ const Canvas = ({ initialData }: { initialData: string }) => {
   const saveData = useCallback(async () => {
     if (!taskId) return;
     const finalElements = whiteBoard?.filter((element: ExcalidrawElement) => !element.isDeleted);
+    if (!finalElements) return;
     try {
       await setBoardData(taskId, finalElements);
       toast.success("Board saved successfully.");
