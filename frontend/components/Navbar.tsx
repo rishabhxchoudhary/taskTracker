@@ -336,6 +336,9 @@ export function NavbarComponent() {
           {auth && auth.user ? (
             <>
             <NavbarItem>
+            <Button onPress={() => setIsOpen(true)}>Open Tour</Button>
+          </NavbarItem>
+            <NavbarItem>
               <Dropdown placement="bottom-end">
                 <DropdownTrigger>
                   <Avatar
@@ -366,9 +369,7 @@ export function NavbarComponent() {
                 </DropdownMenu>
               </Dropdown>
             </NavbarItem>
-            <NavbarItem>
-            <Button onPress={() => setIsOpen(true)}>Open Tour</Button>
-          </NavbarItem>
+            
           </>
           ) : (
             <>
@@ -489,6 +490,9 @@ export function NavbarComponent() {
           )}
           {auth && auth.user ? (
             <>
+             <NavbarMenuItem>
+             <Button onPress={() => {setIsMenuOpen(false);setIsOpen(true)}}>Open Tour</Button>
+           </NavbarMenuItem>
             <NavbarMenuItem>
               <Dropdown placement="bottom-end">
                 <DropdownTrigger>
@@ -520,9 +524,7 @@ export function NavbarComponent() {
                 </DropdownMenu>
               </Dropdown>
             </NavbarMenuItem>
-             <NavbarMenuItem>
-             <Button onPress={() => {setIsMenuOpen(false);setIsOpen(true)}}>Open Tour</Button>
-           </NavbarMenuItem>
+            
            </>
           ) : (
             <>
