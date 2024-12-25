@@ -227,6 +227,7 @@ export function NavbarComponent() {
               onClick={() => {
                 if (auth.user) {
                   navigate("/project");
+                  projectStore.setSelectedTab("list");
                 } else {
                   navigate("/");
                 }
