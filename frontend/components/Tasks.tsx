@@ -483,7 +483,7 @@ const Tasks = ({ tasks, project, setTasks }) => {
     if (!taskToDelete) return;
     if (!project) return;
     setLoading(true);
-    await deleteTask(taskToDelete.id, project.id);
+    await deleteTask(taskToDelete.id, project.currentProject.id);
     setTasks((prev) => prev.filter((task) => task.id !== taskToDelete.id));
     toast.success("Task Deleted Successfully");
     setLoading(false);
@@ -743,7 +743,7 @@ const Tasks = ({ tasks, project, setTasks }) => {
                       color="danger"
                       className="text-danger"
                       onPress={() => {
-                        updateTaskStatus(taskToEdit.id, project.id, "to_do");
+                        updateTaskStatus(taskToEdit.id, project.currentProject.id, "to_do");
                       }}
                       key="to_do"
                     >
@@ -755,7 +755,7 @@ const Tasks = ({ tasks, project, setTasks }) => {
                       onPress={() => {
                         updateTaskStatus(
                           taskToEdit.id,
-                          project.id,
+                          project.currentProject.id,
                           "in_progress"
                         );
                       }}
@@ -765,7 +765,7 @@ const Tasks = ({ tasks, project, setTasks }) => {
                     </DropdownItem>
                     <DropdownItem
                       onPress={() => {
-                        updateTaskStatus(taskToEdit.id, project.id, "done");
+                        updateTaskStatus(taskToEdit.id, project.currentProject.id, "done");
                       }}
                       color="success"
                       className="text-success"
