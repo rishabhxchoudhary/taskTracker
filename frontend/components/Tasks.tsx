@@ -726,19 +726,19 @@ const Tasks: React.FC<Props> = ({ tasks, project, setTasks }) => {
                     <Button
                       // radius="full"
                       color={
-                        taskToEdit.status == "to_do"
+                        taskToEdit?.status == "to_do"
                           ? "danger"
-                          : taskToEdit.status == "in_progress"
+                          : taskToEdit?.status == "in_progress"
                           ? "warning"
                           : "success"
                       }
                       size="lg"
                       variant="shadow"
                     >
-                      {taskToEdit.status
-                        ? taskToEdit.status == "to_do"
+                      {taskToEdit?.status
+                        ? taskToEdit?.status == "to_do"
                           ? "To Do"
-                          : taskToEdit.status == "in_progress"
+                          : taskToEdit?.status == "in_progress"
                           ? "In Progress"
                           : "Done"
                         : "To Do"}
@@ -749,7 +749,7 @@ const Tasks: React.FC<Props> = ({ tasks, project, setTasks }) => {
                       color="danger"
                       className="text-danger"
                       onPress={() => {
-                        updateTaskStatus(taskToEdit.id, project?.id, "to_do");
+                        updateTaskStatus(taskToEdit?.id, project?.id, "to_do");
                       }}
                       key="to_do"
                     >
@@ -760,7 +760,7 @@ const Tasks: React.FC<Props> = ({ tasks, project, setTasks }) => {
                       className="text-warning"
                       onPress={() => {
                         updateTaskStatus(
-                          taskToEdit.id,
+                          taskToEdit?.id,
                           project?.id,
                           "in_progress"
                         );
@@ -771,7 +771,7 @@ const Tasks: React.FC<Props> = ({ tasks, project, setTasks }) => {
                     </DropdownItem>
                     <DropdownItem
                       onPress={() => {
-                        updateTaskStatus(taskToEdit.id, project?.id, "done");
+                        updateTaskStatus(taskToEdit?.id, project?.id, "done");
                       }}
                       color="success"
                       className="text-success"
