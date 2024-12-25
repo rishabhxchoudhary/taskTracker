@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import Layout from "../layouts/Layout";
 import Canvas from "../components/Canvas";
 import { useParams } from "react-router-dom";
 import { getBoardData } from "../src/api/task";
@@ -25,15 +24,11 @@ const TaskPage = () => {
   }, [taskId]);
 
   if (loading) {
-    return <Layout>
-      <Skeleton style={{height: "100vh", width: "100%"}} />
-    </Layout>;
+    return <Skeleton style={{height: "93vh", width: "100%"}} />;
   }
   
   return (
-    <Layout>
       <Canvas initialData={initialData} />
-    </Layout>
   );
 };
 

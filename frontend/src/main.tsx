@@ -11,6 +11,7 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import Home from "../pages/Home.tsx";
 import Project from "../pages/Project.tsx";
 import TaskPage from "../pages/TaskPage.tsx";
+import { LayoutWrapper } from "../layouts/LayoutWrapper.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -20,21 +21,16 @@ createRoot(document.getElementById("root")!).render(
           <BrowserRouter>
             <Routes>
               <Route
-                path="/project"
                 element={
                   <RequireAuth>
-                    <Project />
+                    <LayoutWrapper />
                   </RequireAuth>
                 }
-              />
-              <Route
-                path="/project/:taskid"
-                element={
-                  <RequireAuth>
-                    <TaskPage />
-                  </RequireAuth>
-                }
-              />
+              >
+                <Route path="/project" element={<Project />}>
+                  <Route path=":taskid" element={<TaskPage />} />
+                </Route>
+              </Route>
               <Route path="/login" element={<LoginPage />} />
               {/* <Route path="/register" element={<Register />} /> */}
               <Route path="/" element={<Home />} />
@@ -46,3 +42,5 @@ createRoot(document.getElementById("root")!).render(
     </GoogleOAuthProvider>
   </StrictMode>
 );
+
+

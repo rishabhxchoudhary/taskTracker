@@ -1,5 +1,4 @@
 import React from "react";
-import Layout from "../layouts/Layout";
 import { TaskInterface } from "../types/types";
 import { getTasks } from "../src/api/task";
 import { useProjectStore } from "../store/projectStore";
@@ -8,8 +7,11 @@ import Tasks from "../components/Tasks";
 import {Tabs, Tab } from "@nextui-org/react";
 import KanbanBoard from "../components/kanbanboard/KanbanBoard";
 import PomodoroTimer from "../components/PomodoroTimer";
+import { Outlet, useParams } from "react-router-dom";
 
 const Project = () => {
+  const prams = useParams();
+  const taskId = prams.taskid;
   const project = useProjectStore((state) => state);
 
   const [tasks, setTasks] = React.useState<TaskInterface[]>([]);
@@ -40,9 +42,11 @@ const Project = () => {
       content: <PomodoroTimer />,
     },
   ];
+
   
   return (
-    <Layout>
+    <>
+    {!taskId && 
       <Tabs id="tabs" selectedKey={project.selectedTab} onSelectionChange={project.setSelectedTab} aria-label="Dynamic tabs" items={tabs}>
         {(item) => (
           <Tab key={item.id} title={item.label}>
@@ -50,7 +54,9 @@ const Project = () => {
           </Tab>
         )}
       </Tabs>
-    </Layout>
+      }
+      <Outlet />
+    </>
   );
 };
 
