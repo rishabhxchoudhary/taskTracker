@@ -74,7 +74,7 @@ const Canvas = ({ initialData }: { initialData: string }) => {
           canvasActions: {
             export: false,
             loadScene: false,
-            saveAsImage: false,
+            saveAsImage: true,
           },
         }}
         onChange={(excaliDrawElements) => {
@@ -82,13 +82,13 @@ const Canvas = ({ initialData }: { initialData: string }) => {
         }}
       >
         <MainMenu>
-          {/* <MainMenu.DefaultItems.SaveAsImage /> */}
+          <MainMenu.DefaultItems.SaveAsImage />
           <MainMenu.DefaultItems.ClearCanvas />
           <MainMenu.DefaultItems.Help />
-          <MainMenu.DefaultItems.ChangeCanvasBackground />
-          <MainMenu.ItemCustom>
+          {/* <MainMenu.ItemCustom>
             <div>Custom Item</div>
-        </MainMenu.ItemCustom>
+        </MainMenu.ItemCustom> */}
+          <MainMenu.DefaultItems.ChangeCanvasBackground />
         </MainMenu>
         <WelcomeScreen>
           <WelcomeScreen.Hints.MenuHint />
