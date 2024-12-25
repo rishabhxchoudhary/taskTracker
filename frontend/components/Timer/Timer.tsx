@@ -17,7 +17,7 @@ const Timer = () => {
   };
 
   return (
-    <div>
+    <div id="timer" >
       <CircularProgress
         aria-label="Timer Progress"
         color={getModeColor(mode)}
