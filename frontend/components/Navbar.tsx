@@ -358,9 +358,11 @@ export function NavbarComponent() {
               </Button>
             )}
           </NavbarItem>
+          {auth && auth.user && 
           <NavbarItem>
             <Button onPress={() => setIsOpen(true)}>Open Tour</Button>
           </NavbarItem>
+          }
       </Navbar>
 
       <Modal isOpen={isDeleteOpen} onOpenChange={onDeleteClose} closeButton>
