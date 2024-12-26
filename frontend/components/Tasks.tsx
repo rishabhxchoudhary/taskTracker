@@ -242,7 +242,7 @@ const Tasks: React.FC<Props> = ({ tasks, project, setTasks }) => {
   const updateTaskStatus = useCallback(
     async (taskId, projectId, status) => {
       setLoading(true);
-      await updateStatus(taskId, projectId, status);
+      await updateStatus(taskId, projectId, status, 0);
       setTasks((prev) => {
         return prev.map((task) => {
           if (task.id === taskId) {
