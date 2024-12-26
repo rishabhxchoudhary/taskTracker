@@ -178,7 +178,7 @@ export function NavbarComponent() {
       }
     };
     getUserProjects();
-  }, [projectStore]);
+  }, []);
 
   const handleDeleteProject = async () => {
     if (projectToDelete) {
@@ -491,9 +491,9 @@ export function NavbarComponent() {
           )}
           {auth && auth.user ? (
             <>
-             {/* <NavbarMenuItem>
+             <NavbarMenuItem>
              <Button onPress={() => {setIsMenuOpen(false);setIsOpen(true)}}>Open Tour</Button>
-           </NavbarMenuItem> */}
+           </NavbarMenuItem>
             <NavbarMenuItem>
               <Dropdown placement="bottom-end">
                 <DropdownTrigger>
