@@ -19,18 +19,20 @@ function needsRebalance(tasksInColumn: TaskInterface[]): boolean {
     const nextPos = sorted[i + 1].position;
 
     if (nextPos - currentPos < POSITION_THRESHOLD) {
+      console.log("taskcolumn", tasksInColumn, "sorted", true);
       return true;
     }
   }
+  console.log("taskcolumn", tasksInColumn, "sorted", false);
   return false;
 }
 
 function rebalancePositions(tasksInColumn: TaskInterface[]): TaskInterface[] {
-    const sorted = [...tasksInColumn].sort((a, b) => a.position - b.position);
-    return sorted.map((task, index) => ({
-      ...task,
-      position: (index + 1) * 1000,
-    }));
+  const sorted = [...tasksInColumn].sort((a, b) => a.position - b.position);
+  return sorted.map((task, index) => ({
+    ...task,
+    position: (index + 1) * 1000,
+  }));
 }
 
 interface Columns {
@@ -73,20 +75,25 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, setTasks }) => {
   }, [tasks]);
 
   useEffect(() => {
-    const updatedColumns = async ()=>{
-        for (const key in columns) {
-          if (needsRebalance(columns[key])) {
-            const newColumns: Columns = { ...columns };
-            newColumns[key] = rebalancePositions(columns[key]);
-            await bulkUpdate(newColumns[key]);
-            setColumns(newColumns);
-          }
+    const updatedColumns = async () => {
+      for (const key in columns) {
+        if (needsRebalance(columns[key])) {
+          const newColumns: Columns = { ...columns };
+          newColumns[key] = rebalancePositions(columns[key]);
+          await bulkUpdate(newColumns[key]);
+          setColumns(newColumns);
         }
-    }
+      }
+    };
     updatedColumns();
   }, [columns]);
   const onDragEnd = async (result: DropResult) => {
     const { destination, source, draggableId } = result;
+
+    console.log("destination", destination);
+    console.log("source", source);
+    console.log("draggableId", draggableId);
+
     if (!destination) return;
 
     const sourceColumnId = source.droppableId;
@@ -117,72 +124,86 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, setTasks }) => {
         const [movedTask] = columnTasks.splice(source.index, 1);
         columnTasks.splice(destination.index, 0, movedTask);
         newColumns[sourceColumnId] = columnTasks;
+        let newPos: number;
+        if (destination.index === 0) {
+          console.log("here0");
+          const nextTask = columnTasks[1]; // The task that used to be at the top
+          newPos = nextTask ? nextTask.position / 2 : 1000;
+        } else if (destination.index === columnTasks.length - 1) {
+          console.log("here1");
+          const prevTask = columnTasks[columnTasks.length - 2];
+          newPos = prevTask ? prevTask.position + 1000 : 1000;
+        } else {
+          const prevTask = columnTasks[destination.index - 1];
+          const nextTask = columnTasks[destination.index + 1];
+          newPos = (prevTask.position + nextTask.position) / 2;
+        }
+        console.log("newPos", newPos);
+
+        setTasks((prevTasks) =>
+          prevTasks.map((task) =>
+            task.id === draggableId
+              ? {
+                  ...task,
+                  status: destColumnId as TaskInterface["status"],
+                  position: newPos,
+                }
+              : task
+          )
+        );
+        updateStatus(draggableId, project.id, destColumnId, newPos);
+        newColumns[destColumnId][destination.index].position = newPos;
         return newColumns;
       });
-      const updatedColumn = columns[sourceColumnId];
-      let newPos: number;
-      if (destination.index === 0) {
-        const nextTask = updatedColumn[1];
-        newPos = nextTask ? nextTask.position / 2 : 1000;
-      } else if (destination.index === updatedColumn.length - 1) {
-        const prevTask = updatedColumn[updatedColumn.length - 2];
-        newPos = prevTask ? prevTask.position + 1000 : 1000;
-      } else {
-        const prevTask = updatedColumn[destination.index - 1];
-        const nextTask = updatedColumn[destination.index];
-        newPos = (prevTask.position + nextTask.position) / 2;
-      }
-      setColumns((prevColumns) => {
-        const newColumns: Columns = { ...prevColumns };
-        newColumns[sourceColumnId][destination.index].position = newPos;
-        return newColumns;
-      })
-      setTasks((prevTasks) =>
-        prevTasks.map((task) =>
-          task.id === draggableId ? { ...task, position: newPos } : task
-        )
-      );
-      await updateStatus(draggableId, project.id, sourceColumnId, newPos);
       return;
     }
     setColumns((prevColumns) => {
       const newColumns: Columns = { ...prevColumns };
+      console.log("newColumns", newColumns);
       const sourceTasks = Array.from(newColumns[sourceColumnId]);
       const [movedTask] = sourceTasks.splice(source.index, 1);
       movedTask.status = destColumnId as TaskInterface["status"];
       const destTasks = Array.from(newColumns[destColumnId]);
+      console.log("destTasks1", destTasks);
       destTasks.splice(destination.index, 0, movedTask);
+      console.log("destTasks2", destTasks);
       newColumns[destColumnId] = destTasks;
       newColumns[sourceColumnId] = sourceTasks;
+      let newPos: number;
+
+      if (destination.index === 0) {
+        console.log("here0");
+        const nextTask = destTasks[1]; // The task that used to be at the top
+        newPos = nextTask ? nextTask.position / 2 : 1000;
+      } else if (destination.index === destTasks.length - 1) {
+        console.log("here1");
+        const prevTask = destTasks[destTasks.length - 2];
+        newPos = prevTask ? prevTask.position + 1000 : 1000;
+      } else {
+        const prevTask = destTasks[destination.index - 1];
+        const nextTask = destTasks[destination.index + 1];
+        newPos = (prevTask.position + nextTask.position) / 2;
+      }
+      console.log("newPos", newPos);
+
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task.id === draggableId
+            ? {
+                ...task,
+                status: destColumnId as TaskInterface["status"],
+                position: newPos,
+              }
+            : task
+        )
+      );
+
+      newColumns[destColumnId][destination.index].position = newPos;
+
+      console.log("newColumns", newColumns);
+      updateStatus(draggableId, project.id, destColumnId, newPos);
       return newColumns;
     });
-
-    if (!project) return;
-    const updatedColumn = columns[destColumnId];
-    let newPos: number;
-    if (destination.index === 0) {
-      const nextTask = updatedColumn[0]; // The task that used to be at the top
-      newPos = nextTask ? nextTask.position / 2 : 1000;
-    } else if (destination.index === updatedColumn.length - 1) {
-      const prevTask = updatedColumn[updatedColumn.length - 1];
-      newPos = prevTask ? prevTask.position + 1000 : 1000;
-    } else {
-      const prevTask = updatedColumn[destination.index - 1];
-      const nextTask = updatedColumn[destination.index];
-      newPos = (prevTask.position + nextTask.position) / 2;
-    }
-    await updateStatus(draggableId, project.id, destColumnId, newPos);
-    setTasks((prevTasks) =>
-      prevTasks.map((task) =>
-        task.id === draggableId
-          ? {
-              ...task,
-              status: destColumnId as TaskInterface["status"],
-              position: newPos,
-            }
-          : task
-      )
-    );
   };
   console.log("columns", columns);
   return (
