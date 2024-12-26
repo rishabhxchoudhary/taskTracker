@@ -136,7 +136,8 @@ const Tasks: React.FC<Props> = ({ tasks, project, setTasks }) => {
   const [visibleColumns, setVisibleColumns] = React.useState<Selection>(
     new Set(INITIAL_VISIBLE_COLUMNS)
   );
-  const [statusFilter, setStatusFilter] = React.useState<Selection>("all");
+  const [statusFilter, setStatusFilter] = React.useState<Selection>(
+    new Set(["to_do", "in_progress"]));
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [sortDescriptor, setSortDescriptor] = React.useState<SortDescriptor>({
     column: "created_at",
@@ -153,46 +154,6 @@ const Tasks: React.FC<Props> = ({ tasks, project, setTasks }) => {
       Array.from(visibleColumns).includes(column.uid)
     );
   }, [visibleColumns]);
-
-  // const filteredItems = React.useMemo(() => {
-  //   let filteredTasks = [...tasks];
-
-  //   if (hasSearchFilter) {
-  //     filteredTasks = filteredTasks.filter((task) =>
-  //       task.title.toLowerCase().includes(filterValue.toLowerCase())
-  //     );
-  //   }
-
-  //   if (
-  //     statusFilter !== "all" &&
-  //     Array.from(statusFilter).length !== statusOptions.length
-  //   ) {
-  //     filteredTasks = filteredTasks.filter((task) =>
-  //       Array.from(statusFilter).includes(task.status)
-  //     );
-  //   }
-
-  //   return filteredTasks;
-  // }, [tasks, filterValue, statusFilter, hasSearchFilter]);
-
-  // const pages = Math.ceil(filteredItems.length / rowsPerPage);
-
-  // const items = React.useMemo(() => {
-  //   const start = (page - 1) * rowsPerPage;
-  //   const end = start + rowsPerPage;
-
-  //   return filteredItems.slice(start, end);
-  // }, [page, filteredItems, rowsPerPage]);
-
-  // const sortedItems = React.useMemo(() => {
-  //   return [...items].sort((a, b) => {
-  //     const first = a[sortDescriptor.column];
-  //     const second = b[sortDescriptor.column];
-  //     const cmp = first < second ? -1 : first > second ? 1 : 0;
-
-  //     return sortDescriptor.direction === "descending" ? -cmp : cmp;
-  //   });
-  // }, [sortDescriptor, items]);
 
   const filteredItems = React.useMemo(() => {
     let filteredTasks = [...tasks];
