@@ -50,6 +50,7 @@ export interface TaskInterface {
     priority: "low" | "medium" | "high" | "urgent";
     board_data: string | null;
     status: "to_do" | "in_progress" | "done";
+    position: number; 
 }
 
 

@@ -171,10 +171,10 @@ type UpdateStatusBody struct {
 	TaskID    primitive.ObjectID `json:"taskId"`
 	ProjectID primitive.ObjectID `json:"projectId"`
 	Status    models.TaskStatus  `json:"status"`
+	Position  float64            `json:"position"`
 }
 
 func UpdateStatus(w http.ResponseWriter, r *http.Request) {
-	// JWT validation
 	_, err := GetUserFromJWT(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
@@ -185,7 +185,31 @@ func UpdateStatus(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	err = database.UpdateStatus(body.TaskID, body.ProjectID, body.Status)
+	err = database.UpdateStatus(body.TaskID, body.ProjectID, body.Status, body.Position)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+type UpdateBulkBody struct {
+	Tasks []models.Task `json:"tasks"`
+}
+
+func UpdateBulk(w http.ResponseWriter, r *http.Request) {
+	// JWT validation
+	_, err := GetUserFromJWT(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+	var body UpdateBulkBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	err = database.UpdateBulk(body.Tasks)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

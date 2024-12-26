@@ -30,4 +30,5 @@ type Task struct {
 	CreatedAt    int64              `json:"created_at,omitempty" bson:"created_at,omitempty"`
 	BoardData    []byte             `json:"board_data,omitempty" bson:"board_data,omitempty"`
 	Status       TaskStatus         `json:"status,omitempty" bson:"status,omitempty"`
+	Position     float64            `json:"position,omitempty" bson:"position,omitempty"`
 }

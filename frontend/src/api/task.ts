@@ -12,13 +12,14 @@ export const getTasks = async (projectId: string): Promise<TaskResponse[]>  => {
         projectId
     });
     response.data?.forEach((task: TaskResponse) => {
-        if (!task.deadline_date) return;
-        const utcDate = new Date(task.deadline_date * 1000);
-        const year = utcDate.getFullYear();
-        const month = utcDate.getMonth();
-        const day = utcDate.getDate();
-        task.deadlineDate = new CalendarDate(year, month, day);
-
+        if (task.deadline_date) {
+            const utcDate = new Date(task.deadline_date * 1000);
+            const year = utcDate.getFullYear();
+            const month = utcDate.getMonth();
+            const day = utcDate.getDate();
+            task.deadlineDate = new CalendarDate(year, month, day);
+        }
+        task.position =  task.position || 2^30 - 1;
     })
     return response.data || [];
 }
@@ -43,11 +44,12 @@ export const deleteTask = async (taskId: string, projectId: string): Promise<nul
     return;
 }
 
-export const updateStatus = async (taskId: string, projectId: string, status: string): Promise<null>  => {
+export const updateStatus = async (taskId: string, projectId: string, status: string, position: number): Promise<null>  => {
     await client.post(`/task/update_status`,{
         taskId,
         projectId,
-        status
+        status,
+        position
     });
     return;
 }
@@ -60,6 +62,13 @@ export const getBoardData = async (taskId: string): Promise<string | null> => {
 export const setBoardData = async (taskId: string, elements: ExcalidrawElement[]): Promise<null> => {
     await client.post(`/task/board/${taskId}`, {
         board_data: JSON.stringify(elements)
+    });
+    return;
+}
+
+export const bulkUpdate = async (tasks: TaskInterface[]): Promise<null> => {
+    await client.post(`/task/update_bulk`,{
+        tasks
     });
     return;
 }

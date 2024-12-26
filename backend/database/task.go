@@ -4,6 +4,7 @@ import (
 	"backend/models"
 	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"time"
 
@@ -116,14 +117,30 @@ func DeleteTask(taskID primitive.ObjectID, projectID primitive.ObjectID) error {
 	return err
 }
 
-func UpdateStatus(taskID primitive.ObjectID, projectID primitive.ObjectID, status models.TaskStatus) error {
+func UpdateStatus(taskID primitive.ObjectID, projectID primitive.ObjectID, status models.TaskStatus, position float64) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	update := bson.M{
 		"$set": bson.M{
-			"status": status,
+			"status":   status,
+			"position": position,
 		},
 	}
-	_, err := GetTaskCollection().UpdateOne(ctx, bson.M{"_id": taskID, "project_id": projectID}, update)
+
+	var updatedTask models.Task
+	err := GetTaskCollection().FindOneAndUpdate(ctx, bson.M{"_id": taskID, "project_id": projectID}, update).Decode(&updatedTask)
+	if err != nil {
+		if err.Error() == "mongo: no documents in result" {
+			return fmt.Errorf("task not found")
+		}
+		return err
+	}
+	return err
+}
+
+func UpdateBulk(tasks []models.Task) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	_, err := GetTaskCollection().UpdateMany(ctx, bson.M{"_id": bson.M{"$in": tasks}}, bson.M{"$set": bson.M{"status": tasks[0].Status, "position": tasks[0].Position}})
 	return err
 }
