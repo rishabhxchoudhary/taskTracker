@@ -1,4 +1,5 @@
 import { CalendarDate } from "@nextui-org/react";
+import React from "react";
 // import React from "react";
 
 export interface User {
@@ -38,7 +39,7 @@ export interface ProjectStore {
     reset: () => void;
     setCurrentProject: (project: Project) => void;
     setCurrentDate: (date: CalendarDate) => void;
-    setSelectedTab: (tab: string) => void; 
+    setSelectedTab: (tab: React.Key) => void; 
 }
 
 export interface TaskInterface {

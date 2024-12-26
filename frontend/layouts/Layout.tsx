@@ -70,7 +70,7 @@ function Layout({ children }) {
         }
       ]
     return (
-        <div className='flex flex-col'  style={{ minHeight: "100vh"}}>
+        <div className='flex flex-col min-w-screen max-w-screen overflow-auto'  style={{ minHeight: "100vh"}}>
             <TourProvider currentStep={step} setCurrentStep={setCurrentStep}  steps={steps}>
                 <Toaster/>
                 <NavbarComponent />
