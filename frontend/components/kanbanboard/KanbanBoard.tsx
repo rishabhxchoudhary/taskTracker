@@ -44,15 +44,13 @@ interface KanbanBoardProps {
 
 const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, setTasks }) => {
   const project = useProjectStore((state) => state.currentProject);
-  const [firstTime, setFirstTime] = React.useState(true);
-
+  // const [firstTime, setFirstTime] = React.useState(true);
   const [columns, setColumns] = useState<Columns>({
     to_do: [],
     in_progress: [],
     done: [],
   });
   useEffect(() => {
-    if (!firstTime) return;
     const initialColumns: Columns = {
       to_do: [],
       in_progress: [],
@@ -72,10 +70,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, setTasks }) => {
       );
     }
     setColumns(initialColumns);
-    if (tasks && tasks?.length > 0) {
-      setFirstTime(false);
-    }
-  }, [tasks, firstTime]);
+  }, [tasks]);
 
   useEffect(() => {
     const updatedColumns = async ()=>{
