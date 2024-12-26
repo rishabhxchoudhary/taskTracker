@@ -1,5 +1,4 @@
 // KanbanBoard.tsx
-
 import React, { useState, useEffect } from "react";
 import { DragDropContext, DropResult, Droppable } from "@hello-pangea/dnd";
 import { TaskInterface } from "../../types/types";
@@ -11,19 +10,14 @@ const POSITION_THRESHOLD = 1;
 
 function needsRebalance(tasksInColumn: TaskInterface[]): boolean {
   if (tasksInColumn.length < 2) return false;
-
   const sorted = [...tasksInColumn].sort((a, b) => a.position - b.position);
-
   for (let i = 0; i < sorted.length - 1; i++) {
     const currentPos = sorted[i].position;
     const nextPos = sorted[i + 1].position;
-
     if (nextPos - currentPos < POSITION_THRESHOLD) {
-      console.log("taskcolumn", tasksInColumn, "sorted", true);
       return true;
     }
   }
-  console.log("taskcolumn", tasksInColumn, "sorted", false);
   return false;
 }
 
@@ -46,7 +40,6 @@ interface KanbanBoardProps {
 
 const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, setTasks }) => {
   const project = useProjectStore((state) => state.currentProject);
-  // const [firstTime, setFirstTime] = React.useState(true);
   const [columns, setColumns] = useState<Columns>({
     to_do: [],
     in_progress: [],
@@ -89,11 +82,6 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, setTasks }) => {
   }, [columns]);
   const onDragEnd = async (result: DropResult) => {
     const { destination, source, draggableId } = result;
-
-    console.log("destination", destination);
-    console.log("source", source);
-    console.log("draggableId", draggableId);
-
     if (!destination) return;
 
     const sourceColumnId = source.droppableId;
@@ -126,11 +114,9 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, setTasks }) => {
         newColumns[sourceColumnId] = columnTasks;
         let newPos: number;
         if (destination.index === 0) {
-          console.log("here0");
           const nextTask = columnTasks[1]; // The task that used to be at the top
           newPos = nextTask ? nextTask.position / 2 : 1000;
         } else if (destination.index === columnTasks.length - 1) {
-          console.log("here1");
           const prevTask = columnTasks[columnTasks.length - 2];
           newPos = prevTask ? prevTask.position + 1000 : 1000;
         } else {
@@ -138,7 +124,6 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, setTasks }) => {
           const nextTask = columnTasks[destination.index + 1];
           newPos = (prevTask.position + nextTask.position) / 2;
         }
-        console.log("newPos", newPos);
 
         setTasks((prevTasks) =>
           prevTasks.map((task) =>
@@ -159,24 +144,19 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, setTasks }) => {
     }
     setColumns((prevColumns) => {
       const newColumns: Columns = { ...prevColumns };
-      console.log("newColumns", newColumns);
       const sourceTasks = Array.from(newColumns[sourceColumnId]);
       const [movedTask] = sourceTasks.splice(source.index, 1);
       movedTask.status = destColumnId as TaskInterface["status"];
       const destTasks = Array.from(newColumns[destColumnId]);
-      console.log("destTasks1", destTasks);
       destTasks.splice(destination.index, 0, movedTask);
-      console.log("destTasks2", destTasks);
       newColumns[destColumnId] = destTasks;
       newColumns[sourceColumnId] = sourceTasks;
       let newPos: number;
 
       if (destination.index === 0) {
-        console.log("here0");
         const nextTask = destTasks[1]; // The task that used to be at the top
         newPos = nextTask ? nextTask.position / 2 : 1000;
       } else if (destination.index === destTasks.length - 1) {
-        console.log("here1");
         const prevTask = destTasks[destTasks.length - 2];
         newPos = prevTask ? prevTask.position + 1000 : 1000;
       } else {
@@ -184,8 +164,6 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, setTasks }) => {
         const nextTask = destTasks[destination.index + 1];
         newPos = (prevTask.position + nextTask.position) / 2;
       }
-      console.log("newPos", newPos);
-
       setTasks((prevTasks) =>
         prevTasks.map((task) =>
           task.id === draggableId
@@ -197,15 +175,11 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, setTasks }) => {
             : task
         )
       );
-
       newColumns[destColumnId][destination.index].position = newPos;
-
-      console.log("newColumns", newColumns);
       updateStatus(draggableId, project.id, destColumnId, newPos);
       return newColumns;
     });
   };
-  console.log("columns", columns);
   return (
     <div id="kanbanboard" className="flex flex-col">
       <DragDropContext onDragEnd={onDragEnd}>
