@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { DragDropContext, DropResult, Droppable } from '@hello-pangea/dnd';
 import { TaskInterface } from '../../types/types';
 import Column from './Column';
-// import DeleteArea from './DeleteArea';
 import { updateStatus } from '../../src/api/task';
 import { useProjectStore } from '../../store/projectStore';
 
@@ -19,12 +18,15 @@ interface KanbanBoardProps {
 
 const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, setTasks }) => {
     const project = useProjectStore((state) => state.currentProject);
+    const [firstTime, setFirstTime] = React.useState(true);
+
     const [columns, setColumns] = useState<Columns>({
         to_do: [],
         in_progress: [],
         done: [],
     });
     useEffect(() => {
+        if (!firstTime) return;
         const initialColumns: Columns = {
             to_do: [],
             in_progress: [],
@@ -38,10 +40,11 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, setTasks }) => {
                 initialColumns[task.status] = [task];
             }
         });
-
         setColumns(initialColumns);
-    }, [tasks]);
-
+        if (tasks && tasks?.length > 0) {
+            setFirstTime(false);
+        }
+    }, [tasks, firstTime]);
     const onDragEnd = async (result: DropResult) => {
         const { destination, source, draggableId } = result;
         if (!destination) return;
@@ -100,7 +103,6 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, setTasks }) => {
             );
         }
     };
-
     return (
         <div id="kanbanboard" className="flex flex-col">
             <DragDropContext onDragEnd={onDragEnd}>
@@ -119,7 +121,6 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, setTasks }) => {
                         </Droppable>
                     ))}
                 </div>
-                {/* <DeleteArea /> */}
             </DragDropContext>
         </div>
     );
