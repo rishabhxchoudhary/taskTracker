@@ -53,7 +53,7 @@ function Layout({ children }) {
         {
           selector: '#whiteboard',
           content:<div className="text-sm text-black">
-            This is the white board. You can draw here.
+            This is the white board. You can draw here. You can also create <span className="font-bold">Public Sharable links</span> from the menu on top-left of the whiteboard and share them online with others.
           </div>,
         },
         {
