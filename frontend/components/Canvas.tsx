@@ -45,7 +45,7 @@ const Canvas = ({ initialData }: { initialData: string }) => {
     if (!finalElements) return;
     try {
       await setBoardData(taskId, finalElements);
-      toast.success("Board saved successfully.");
+      // toast.success("Board saved successfully.");
     } catch (error) {
       console.error("Error saving board data:", error);
     }
