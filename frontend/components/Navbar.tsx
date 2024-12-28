@@ -84,15 +84,12 @@ export function NavbarComponent() {
   const {
     timeLeft,
     isRunning,
-    decrementTime,
     maxTime,
     mode,
     setMode,
     incrementCycle,
     cycle,
-    pauseTimer,
   } = useTimerStore();
-  const timerRef = React.useRef<NodeJS.Timeout | null>(null);
 
   const loginClick = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
@@ -107,6 +104,7 @@ export function NavbarComponent() {
       toast.success("Logged In Successfully");
     },
   });
+  const worker = useTimerStore((state) => state.worker);
 
   React.useEffect(() => {
     if (isRunning) {
@@ -121,45 +119,45 @@ export function NavbarComponent() {
     } else {
       document.title = "Task Tracker";
     }
-  }, [timeLeft, mode]);
+  }, [timeLeft, mode, isRunning]);
 
-  React.useEffect(() => {
-    if (isRunning && timeLeft > 0) {
-      timerRef.current = setInterval(() => {
-        decrementTime();
-      }, 1000);
-    } else if (timeLeft === 0) {
-      alertSound.play();
-      pauseTimer();
-      if (Notification.permission === "granted") {
-        new Notification(`Time for ${mode === "work" ? "a break!" : "work!"}`);
+  
+ React.useEffect(() => {
+    // Handle when the timer finishes
+    const handleFinished = () => {
+        alertSound.play();
+
+      if (Notification.permission === 'granted') {
+        new Notification(
+          `Time for ${mode === 'work' ? 'a break!' : 'work!'}`
+        );
       }
-      if (mode === "work") {
+
+      if (mode === 'work') {
         if ((cycle + 1) % 2 === 0) {
-          setMode("longBreak");
+          setMode('longBreak');
         } else {
-          setMode("shortBreak");
+          setMode('shortBreak');
         }
       } else {
-        setMode("work");
-        if (mode === "shortBreak") {
+        setMode('work');
+        if (mode === 'shortBreak') {
           incrementCycle();
         }
       }
-    }
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [
-    isRunning,
-    timeLeft,
-    mode,
-    decrementTime,
-    setMode,
-    incrementCycle,
-    cycle,
-    pauseTimer,
-  ]);
+    const handleMessage = (e: MessageEvent) => {
+      if (e.data.type === 'finished') {
+        handleFinished();
+      }
+    };
+
+    worker.addEventListener('message', handleMessage);
+
+    return () => {
+      worker.removeEventListener('message', handleMessage);
+    };
+  }, [mode, cycle, setMode, incrementCycle, worker]);
 
   const navigate = useNavigate();
   const auth = useAuthStore((state) => state);

@@ -58,6 +58,7 @@ export type TimerState = {
   mode: 'work' | 'shortBreak' | 'longBreak';
   timeLeft: number; // in seconds
   isRunning: boolean;
+  worker: Worker;
   maxTime: number;
   cycle: number;
   setMode: (mode: 'work' | 'shortBreak' | 'longBreak') => void;
