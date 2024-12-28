@@ -109,6 +109,21 @@ export function NavbarComponent() {
   });
 
   React.useEffect(() => {
+    if (isRunning) {
+      const modeText =
+        mode === "work"
+          ? "Work"
+          : mode === "shortBreak"
+          ? "Short Break"
+          : "Long Break";
+
+      document.title = `${formatTime(timeLeft)} - ${modeText} | Task Tracker`;
+    } else {
+      document.title = "Task Tracker";
+    }
+  }, [timeLeft, mode]);
+
+  React.useEffect(() => {
     if (isRunning && timeLeft > 0) {
       timerRef.current = setInterval(() => {
         decrementTime();
@@ -212,8 +227,7 @@ export function NavbarComponent() {
     <>
       <Navbar
         classNames={{
-          base: cn("border-default-100", {
-          }),
+          base: cn("border-default-100", {}),
           wrapper: "w-full justify-center",
           item: "hidden md:flex",
         }}
@@ -336,42 +350,41 @@ export function NavbarComponent() {
           )}
           {auth && auth.user ? (
             <>
-            <NavbarItem>
-            <Button onPress={() => setIsOpen(true)}>Open Tour</Button>
-          </NavbarItem>
-            <NavbarItem>
-              <Dropdown placement="bottom-end">
-                <DropdownTrigger>
-                  <Avatar
-                    isBordered
-                    as="button"
-                    className="transition-transform"
-                    color="default"
-                    name={auth?.user?.username}
-                    size="sm"
-                    src={auth?.user?.avatar}
-                  />
-                </DropdownTrigger>
-                <DropdownMenu aria-label="Profile Actions" variant="flat">
-                  <DropdownItem key="profile" className="h-14 gap-2 ">
-                    <p className="font-semibold">Signed in as</p>
-                    <p className="font-semibold">{auth?.user?.username}</p>
-                    <p className="">{auth?.user?.email}</p>
-                  </DropdownItem>
-                  <DropdownItem key="logout">
-                    <Button
-                      variant="shadow"
-                      color="danger"
-                      onPress={auth?.logout}
-                    >
-                      Log Out
-                    </Button>
-                  </DropdownItem>
-                </DropdownMenu>
-              </Dropdown>
-            </NavbarItem>
-            
-          </>
+              <NavbarItem>
+                <Button onPress={() => setIsOpen(true)}>Open Tour</Button>
+              </NavbarItem>
+              <NavbarItem>
+                <Dropdown placement="bottom-end">
+                  <DropdownTrigger>
+                    <Avatar
+                      isBordered
+                      as="button"
+                      className="transition-transform"
+                      color="default"
+                      name={auth?.user?.username}
+                      size="sm"
+                      src={auth?.user?.avatar}
+                    />
+                  </DropdownTrigger>
+                  <DropdownMenu aria-label="Profile Actions" variant="flat">
+                    <DropdownItem key="profile" className="h-14 gap-2 ">
+                      <p className="font-semibold">Signed in as</p>
+                      <p className="font-semibold">{auth?.user?.username}</p>
+                      <p className="">{auth?.user?.email}</p>
+                    </DropdownItem>
+                    <DropdownItem key="logout">
+                      <Button
+                        variant="shadow"
+                        color="danger"
+                        onPress={auth?.logout}
+                      >
+                        Log Out
+                      </Button>
+                    </DropdownItem>
+                  </DropdownMenu>
+                </Dropdown>
+              </NavbarItem>
+            </>
           ) : (
             <>
               <NavbarItem>
@@ -393,7 +406,6 @@ export function NavbarComponent() {
         <NavbarMenuToggle className="text-default-400 md:hidden" />
 
         <NavbarMenu className="top-[calc(var(--navbar-height)_-_1px)] max-h-fit  pb-6 pt-6 shadow-medium backdrop-blur-md backdrop-saturate-150">
-          
           {auth && auth.user && auth?.user?.created_at && (
             <>
               <NavbarMenuItem id="projects">
@@ -491,42 +503,48 @@ export function NavbarComponent() {
           )}
           {auth && auth.user ? (
             <>
-             <NavbarMenuItem>
-             <Button onPress={() => {setIsMenuOpen(false);setIsOpen(true)}}>Open Tour</Button>
-           </NavbarMenuItem>
-            <NavbarMenuItem>
-              <Dropdown placement="bottom-end">
-                <DropdownTrigger>
-                  <Avatar
-                    isBordered
-                    as="button"
-                    className="transition-transform"
-                    color="default"
-                    name={auth?.user?.username}
-                    size="sm"
-                    src={auth?.user?.avatar}
-                  />
-                </DropdownTrigger>
-                <DropdownMenu aria-label="Profile Actions" variant="flat">
-                  <DropdownItem key="profile" className="h-14 gap-2 ">
-                    <p className="font-semibold">Signed in as</p>
-                    <p className="font-semibold">{auth?.user?.username}</p>
-                    <p className="">{auth?.user?.email}</p>
-                  </DropdownItem>
-                  <DropdownItem key="logout">
-                    <Button
-                      variant="shadow"
-                      color="danger"
-                      onPress={auth?.logout}
-                    >
-                      Log Out
-                    </Button>
-                  </DropdownItem>
-                </DropdownMenu>
-              </Dropdown>
-            </NavbarMenuItem>
-            
-           </>
+              <NavbarMenuItem>
+                <Button
+                  onPress={() => {
+                    setIsMenuOpen(false);
+                    setIsOpen(true);
+                  }}
+                >
+                  Open Tour
+                </Button>
+              </NavbarMenuItem>
+              <NavbarMenuItem>
+                <Dropdown placement="bottom-end">
+                  <DropdownTrigger>
+                    <Avatar
+                      isBordered
+                      as="button"
+                      className="transition-transform"
+                      color="default"
+                      name={auth?.user?.username}
+                      size="sm"
+                      src={auth?.user?.avatar}
+                    />
+                  </DropdownTrigger>
+                  <DropdownMenu aria-label="Profile Actions" variant="flat">
+                    <DropdownItem key="profile" className="h-14 gap-2 ">
+                      <p className="font-semibold">Signed in as</p>
+                      <p className="font-semibold">{auth?.user?.username}</p>
+                      <p className="">{auth?.user?.email}</p>
+                    </DropdownItem>
+                    <DropdownItem key="logout">
+                      <Button
+                        variant="shadow"
+                        color="danger"
+                        onPress={auth?.logout}
+                      >
+                        Log Out
+                      </Button>
+                    </DropdownItem>
+                  </DropdownMenu>
+                </Dropdown>
+              </NavbarMenuItem>
+            </>
           ) : (
             <>
               <NavbarMenuItem>
@@ -543,7 +561,6 @@ export function NavbarComponent() {
               </NavbarMenuItem>
             </>
           )}
-          
         </NavbarMenu>
       </Navbar>
 
