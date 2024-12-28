@@ -1,13 +1,11 @@
 // src/store/useTimerStore.ts
 
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { TimerState } from '../types/types';
-import TimerWorker from '../utils/timerWorker?worker';
 
-const useTimerStore = create(
-  persist<TimerState>(
-    (set, get) => {
+import TimerWorker from '../utils/timerWorker?worker';
+import { TimerState } from '../types/types';
+
+const useTimerStore = create<TimerState>((set, get) => {
       // Initialize the worker
       const worker = new TimerWorker();
 
@@ -67,12 +65,7 @@ const useTimerStore = create(
           // Not needed anymore as the worker handles time decrement
         },
       };
-    },
-    {
-      name: 'timer-storage',
-      // You might want to exclude the worker from being persisted
     }
-  )
 );
 
 export default useTimerStore;
