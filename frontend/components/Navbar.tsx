@@ -104,6 +104,8 @@ export function NavbarComponent() {
       toast.success("Logged In Successfully");
     },
   });
+  const timer = useTimerStore((state) => state);
+  console.log("timer", timer);
   const worker = useTimerStore((state) => state.worker);
 
   React.useEffect(() => {
@@ -191,6 +193,7 @@ export function NavbarComponent() {
       }
     };
     getUserProjects();
+    setMode('work');
   }, []);
 
   const handleDeleteProject = async () => {
