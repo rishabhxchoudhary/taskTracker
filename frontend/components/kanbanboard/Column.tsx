@@ -12,9 +12,10 @@ interface ColumnProps {
     tasks: TaskInterface[];
     provided: DroppableProvided;
     isDraggingOver: boolean;
+    recentlyCompleted: Set<string>;
 }
 
-const Column: React.FC<ColumnProps> = ({ title, tasks, provided, isDraggingOver }) => {
+const Column: React.FC<ColumnProps> = ({ title, tasks, provided, isDraggingOver, recentlyCompleted }) => {
     return (
         <div
             className="flex flex-col flex-1 min-w-[300px]"
@@ -29,7 +30,7 @@ const Column: React.FC<ColumnProps> = ({ title, tasks, provided, isDraggingOver 
                 )}
             >
                 {tasks.map((task, index) => (
-                    <TaskCard key={task.id} task={task} index={index} />
+                    <TaskCard  key={task.id} task={task} index={index} isRecentlyCompleted={recentlyCompleted.has(task.id)} />
                 ))}
                 {provided.placeholder}
             </div>

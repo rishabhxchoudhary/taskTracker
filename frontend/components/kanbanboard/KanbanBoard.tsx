@@ -45,6 +45,8 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, setTasks }) => {
     in_progress: [],
     done: [],
   });
+  const [recentlyCompleted, setRecentlyCompleted] = useState<Set<string>>(new Set());
+
   useEffect(() => {
     const initialColumns: Columns = {
       to_do: [],
@@ -136,8 +138,10 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, setTasks }) => {
               : task
           )
         );
-        updateStatus(draggableId, project.id, destColumnId, newPos);
-        newColumns[destColumnId][destination.index].position = newPos;
+        if (project) {
+          updateStatus(draggableId, project.id, destColumnId, newPos);
+          newColumns[destColumnId][destination.index].position = newPos;
+        }
         return newColumns;
       });
       return;
@@ -176,9 +180,15 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, setTasks }) => {
         )
       );
       newColumns[destColumnId][destination.index].position = newPos;
-      updateStatus(draggableId, project.id, destColumnId, newPos);
+      if (project) {
+        updateStatus(draggableId, project.id, destColumnId, newPos);
+      }
       return newColumns;
     });
+    if (destColumnId === "done") {
+
+      setRecentlyCompleted(prev => new Set(prev).add(draggableId));
+    }
   };
   return (
     <div id="kanbanboard" className="flex flex-col">
@@ -193,6 +203,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, setTasks }) => {
                   tasks={tasks}
                   provided={provided}
                   isDraggingOver={snapshot.isDraggingOver}
+                  recentlyCompleted={recentlyCompleted}
                 />
               )}
             </Droppable>
