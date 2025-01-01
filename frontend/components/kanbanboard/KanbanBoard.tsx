@@ -195,6 +195,12 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, setTasks }) => {
           return newSet;
         });
       }, 500);
+    } else {
+      setRecentlyCompleted(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(draggableId);
+        return newSet;
+      });
     }
   };
   return (
