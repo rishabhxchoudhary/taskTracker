@@ -86,13 +86,25 @@ const Canvas = ({ initialData }: { initialData: { elements: ExcalidrawElement[]}
     [taskId, expirationDate, project],
   );
   function handleUpdate(elements: ExcalidrawElement[], files) {
+    const elements2 = elements.filter((e)=> e.isDeleted === false);
+    const files2 = {}
+    if (files ) {
+      for (const [key, value] of Object.entries(files)) {
+        if (elements2.some((e) => e.fileId === key)) {
+          files2[key] = value;
+        }
+      }
+    }
     if (JSON.stringify({
-      elements: elements,
-      files: files
+      elements: elements2,
+      files: files2
     }) == JSON.stringify(whiteBoard)) return;
+    // delete the files that are not in the elements, Files is an object
+    // const files2 = files?.filter((f) => elements2.some((e) => e.fileId === f.id));
+    console.log("here");
     setWhiteBoard({
-      elements: elements,
-      files: files
+      elements: elements2,
+      files: files2
     });
   }
   return (
