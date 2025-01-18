@@ -57,6 +57,14 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	// create an empty board and get its id
+
+	boardId, err := database.CreateEmptyBoard()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	task := models.Task{
 		ProjectID:    body.ProjectID,
 		OwnerID:      user.ID,
@@ -66,6 +74,7 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 		Priority:     body.Priority,
 		CreatedAt:    time.Now().Unix(),
 		Status:       body.Status,
+		BoardId:      boardId,
 	}
 
 	task, err = database.CreateTask(task)

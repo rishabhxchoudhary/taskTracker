@@ -64,3 +64,7 @@ func GetTaskCollection() *mongo.Collection {
 func GetPublicLinkCollection() *mongo.Collection {
 	return Client.Database("yourdbname").Collection("public_links")
 }
+
+func GetBoardCollection() *mongo.Collection {
+	return Client.Database("yourdbname").Collection("boards")
+}

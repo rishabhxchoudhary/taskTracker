@@ -534,7 +534,7 @@ const Tasks: React.FC<Props> = ({ tasks, project, setTasks }) => {
               <TableRow
                 className="cursor-pointer"
                 onClick={() => {
-                  navigate(`/project/${item.id}`);
+                  navigate(`/project/${item.board_id}`);
                 }}
                 key={item.id}
               >

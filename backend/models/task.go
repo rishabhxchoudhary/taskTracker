@@ -28,7 +28,7 @@ type Task struct {
 	Priority     Priority           `json:"priority" bson:"priority"`
 	DeadlineDate int64              `json:"deadline_date,omitempty" bson:"deadline_date,omitempty"`
 	CreatedAt    int64              `json:"created_at,omitempty" bson:"created_at,omitempty"`
-	BoardData    []byte             `json:"board_data,omitempty" bson:"board_data,omitempty"`
+	BoardId      primitive.ObjectID  `json:"board_id" bson:"board_id"`
 	Status       TaskStatus         `json:"status,omitempty" bson:"status,omitempty"`
 	Position     float64            `json:"position,omitempty" bson:"position,omitempty"`
 }

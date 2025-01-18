@@ -48,7 +48,8 @@ export interface TaskInterface {
     description: string;
     deadlineDate: CalendarDate | null;
     priority: "low" | "medium" | "high" | "urgent";
-    board_data: string | null;
+    // board_data: string | null;
+    board_id: string;
     status: "to_do" | "in_progress" | "done";
     position: number; 
 }
