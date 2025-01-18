@@ -28,7 +28,7 @@ const TaskPage = () => {
   }
   
   return (
-      <Canvas initialData={JSON.parse(initialData)} />
+      <Canvas initialData={initialData ? JSON.parse(initialData) : null} />
   );
 };
 

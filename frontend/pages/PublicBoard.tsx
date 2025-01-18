@@ -28,7 +28,7 @@ const PublicBoard = () => {
   }
   return (
     <Layout>
-        <PublicCanvas access="view" initialData={JSON.parse(initialData)} />
+        <PublicCanvas access="view" initialData={initialData ? JSON.parse(initialData) : null} />
     </Layout>
   )
 }
