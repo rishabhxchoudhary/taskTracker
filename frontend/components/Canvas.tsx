@@ -30,22 +30,18 @@ const CopyIcon = () => {
   );
 };
 
-const Canvas = ({ initialData }: { initialData: string }) => {
+const Canvas = ({ initialData }: { initialData: { elements: ExcalidrawElement[]} }) => {
   const params = useParams(); // Fixed typo from 'prams' to 'params'
   const taskId = params.taskid;
-  const [whiteBoard, setWhiteBoard] = React.useState<
-    readonly ExcalidrawElement[] | null
-  >([]);
+  const [whiteBoard, setWhiteBoard] = React.useState(initialData);
+
 
   const {isOpen, onOpen, onOpenChange} = useDisclosure();
   const project = useProjectStore((state) => state.currentProject);
   const saveData = React.useCallback(async () => {
     if (!taskId) return;
-    const finalElements = whiteBoard?.filter((element: ExcalidrawElement) => !element.isDeleted);
-    if (!finalElements) return;
     try {
-      await setBoardData(taskId, finalElements);
-      // toast.success("Board saved successfully.");
+      await setBoardData(taskId, whiteBoard);
     } catch (error) {
       console.error("Error saving board data:", error);
     }
@@ -89,7 +85,16 @@ const Canvas = ({ initialData }: { initialData: string }) => {
     },
     [taskId, expirationDate, project],
   );
-
+  function handleUpdate(elements: ExcalidrawElement[], files) {
+    if (JSON.stringify({
+      elements: elements,
+      files: files
+    }) == JSON.stringify(whiteBoard)) return;
+    setWhiteBoard({
+      elements: elements,
+      files: files
+    });
+  }
   return (
     <div id="whiteboard" style={{ height: "93vh", position: "relative" }}>
       <Excalidraw
@@ -97,7 +102,9 @@ const Canvas = ({ initialData }: { initialData: string }) => {
         initialData={
           initialData
             ? {
-                elements: JSON.parse(initialData),
+                elements: initialData.elements,
+                appState: { viewBackgroundColor: "#1e20" },
+                files: initialData.files
               }
             : undefined
         }
@@ -108,8 +115,8 @@ const Canvas = ({ initialData }: { initialData: string }) => {
             saveAsImage: true,
           },
         }}
-        onChange={(excaliDrawElements) => {
-          setWhiteBoard(excaliDrawElements);
+        onChange={(excaliDrawElements ,appState, files) => {
+          handleUpdate(excaliDrawElements, files);
         }}
       >
         <MainMenu>
