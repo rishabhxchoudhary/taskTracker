@@ -1,8 +1,18 @@
 import { Excalidraw, MainMenu } from "@excalidraw/excalidraw";
 import { ExcalidrawElement } from "@excalidraw/excalidraw/types/element/types";
+import { BinaryFiles } from "@excalidraw/excalidraw/types/types";
 import React from "react";
 
-const Canvas = ({ initialData, access }: { initialData: string, access: "view" | "edit" }) => {
+interface WhiteBoardData {
+  elements: ExcalidrawElement[];
+  files?: BinaryFiles;
+}
+
+interface CanvasProps {
+  initialData: WhiteBoardData;
+  access: "view" | "edit";
+}
+const Canvas = ({ initialData, access }: CanvasProps) => {
 
   const [, setWhiteBoard] = React.useState<
       readonly ExcalidrawElement[] | null
@@ -16,7 +26,9 @@ const Canvas = ({ initialData, access }: { initialData: string, access: "view" |
         initialData={
           initialData
             ? {
-                elements: JSON.parse(initialData),
+                elements: initialData.elements,
+                appState: { viewBackgroundColor: "#1e20" },
+                files: initialData.files
               }
             : undefined
         }

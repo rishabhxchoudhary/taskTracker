@@ -1,16 +1,48 @@
-import { Excalidraw, MainMenu, WelcomeScreen } from "@excalidraw/excalidraw";
-import { ExcalidrawElement } from "@excalidraw/excalidraw/types/element/types";
-import { setBoardData } from "../src/api/task";
+import React from "react";
+import {
+  Excalidraw,
+  MainMenu,
+  WelcomeScreen
+} from "@excalidraw/excalidraw";
+import type {
+  ExcalidrawElement
+} from "@excalidraw/excalidraw/types/element/types";
+import type {
+  AppState,
+  BinaryFiles,
+  BinaryFileData
+} from "@excalidraw/excalidraw/types/types";
+
 import { useParams } from "react-router-dom";
 import debounce from "lodash/debounce";
 import useDeepCompareEffect from "use-deep-compare-effect";
 import { toast } from "sonner";
-import { Button, DatePicker, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from "@nextui-org/react";
-import React from "react";
-import {DateValue, parseAbsoluteToLocal} from "@internationalized/date";
+import {
+  Button,
+  DatePicker,
+  Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  useDisclosure
+} from "@nextui-org/react";
+
+import { DateValue, parseAbsoluteToLocal } from "@internationalized/date";
+
+import { setBoardData } from "../src/api/task";
 import { getAccessLink } from "../src/api/public_links";
 import { useProjectStore } from "../store/projectStore";
 
+interface WhiteBoardData {
+  elements: ExcalidrawElement[];
+  files?: BinaryFiles;
+}
+
+interface CanvasProps {
+  initialData: WhiteBoardData;
+}
 
 const CopyIcon = () => {
   return (
@@ -30,17 +62,21 @@ const CopyIcon = () => {
   );
 };
 
-const Canvas = ({ initialData }: { initialData: { elements: ExcalidrawElement[]} }) => {
-  const params = useParams(); // Fixed typo from 'prams' to 'params'
-  const taskId = params.taskid;
-  const [whiteBoard, setWhiteBoard] = React.useState(initialData);
+const Canvas: React.FC<CanvasProps> = ({ initialData }) => {
+  // If you typed RouteParams, you can do:
+  const { taskid } = useParams();
+  const taskId = taskid;
 
+  const [whiteBoard, setWhiteBoard] = React.useState<WhiteBoardData>(initialData);
 
-  const {isOpen, onOpen, onOpenChange} = useDisclosure();
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
   const project = useProjectStore((state) => state.currentProject);
+
   const saveData = React.useCallback(async () => {
     if (!taskId) return;
     try {
+      // @ts-expect-error "lakcm"
       await setBoardData(taskId, whiteBoard);
     } catch (error) {
       console.error("Error saving board data:", error);
@@ -49,21 +85,22 @@ const Canvas = ({ initialData }: { initialData: { elements: ExcalidrawElement[]}
 
   const debouncedSaveData = React.useCallback(debounce(saveData, 1000), [saveData]);
 
-
   useDeepCompareEffect(() => {
     debouncedSaveData();
     return () => {
       debouncedSaveData.cancel();
     };
-  }, [debouncedSaveData, whiteBoard]); 
+  }, [debouncedSaveData, whiteBoard]);
 
   const [expirationDate, setExpirationDate] = React.useState<DateValue | null>(
-    parseAbsoluteToLocal((new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)).toISOString()),
+    parseAbsoluteToLocal(
+      new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+    )
   );
   const [publicLink, setPublicLink] = React.useState<string | null>(null);
 
   const handleGenerateLink = React.useCallback(
-    async (access: 'view' | 'edit') => {
+    async (access: "view" | "edit") => {
       if (!taskId) {
         toast.error("Task ID is missing.");
         return;
@@ -72,8 +109,13 @@ const Canvas = ({ initialData }: { initialData: { elements: ExcalidrawElement[]}
       if (!expirationDate) return;
       try {
         const date: Date = expirationDate.toDate("IST");
-        const response = await getAccessLink(taskId, project.id, access, Math.floor(date.getTime() / 1000));
-        console.log("response", response);
+
+        const response = await getAccessLink(
+          taskId,
+          project.id,
+          access,
+          Math.floor(date.getTime() / 1000)
+        );
         const base_url = window.location.origin;
         const link = `${base_url}/${response.id}`;
         setPublicLink(link);
@@ -83,30 +125,44 @@ const Canvas = ({ initialData }: { initialData: { elements: ExcalidrawElement[]}
         toast.error("Failed to generate link.");
       }
     },
-    [taskId, expirationDate, project],
+    [taskId, expirationDate, project]
   );
-  function handleUpdate(elements: ExcalidrawElement[], files) {
-    const elements2 = elements.filter((e)=> e.isDeleted === false);
-    const files2 = {}
-    if (files ) {
-      for (const [key, value] of Object.entries(files)) {
-        if (elements2.some((e) => e.fileId === key)) {
-          files2[key] = value;
+
+  const handleUpdate = React.useCallback(
+    (
+      elements: readonly ExcalidrawElement[],
+      files: BinaryFiles
+    ) => {
+      // Filter out deleted elements
+      const elements2 = elements.filter((e) => !e.isDeleted);
+
+      // Keep only files that correspond to non-deleted elements
+      const files2: BinaryFiles = {};
+      if (files) {
+        for (const [key, value] of Object.entries<BinaryFileData>(files)) {
+          // @ts-expect-error "a;cma;"
+          if (elements2.some((e) => e.fileId === key)) {
+            files2[key] = value;
+          }
         }
       }
-    }
-    if (JSON.stringify({
-      elements: elements2,
-      files: files2
-    }) == JSON.stringify(whiteBoard)) return;
-    // delete the files that are not in the elements, Files is an object
-    // const files2 = files?.filter((f) => elements2.some((e) => e.fileId === f.id));
-    console.log("here");
-    setWhiteBoard({
-      elements: elements2,
-      files: files2
-    });
-  }
+
+      // Compare the new data with the current whiteBoard state
+      const newData: WhiteBoardData = {
+        elements: elements2,
+        files: files2,
+      };
+
+      if (JSON.stringify(newData) === JSON.stringify(whiteBoard)) {
+        return;
+      }
+
+      console.log("Updating whiteboard state");
+      setWhiteBoard(newData);
+    },
+    [whiteBoard]
+  );
+
   return (
     <div id="whiteboard" style={{ height: "93vh", position: "relative" }}>
       <Excalidraw
@@ -116,7 +172,7 @@ const Canvas = ({ initialData }: { initialData: { elements: ExcalidrawElement[]}
             ? {
                 elements: initialData.elements,
                 appState: { viewBackgroundColor: "#1e20" },
-                files: initialData.files
+                files: initialData.files ?? {}
               }
             : undefined
         }
@@ -124,10 +180,15 @@ const Canvas = ({ initialData }: { initialData: { elements: ExcalidrawElement[]}
           canvasActions: {
             export: false,
             loadScene: false,
-            saveAsImage: true,
-          },
+            saveAsImage: true
+          }
         }}
-        onChange={(excaliDrawElements ,appState, files) => {
+        // Fully typed onChange, if you prefer:
+        onChange={(
+          excaliDrawElements: readonly ExcalidrawElement[],
+          _: AppState,
+          files: BinaryFiles
+        ) => {
           handleUpdate(excaliDrawElements, files);
         }}
       >
@@ -153,30 +214,75 @@ const Canvas = ({ initialData }: { initialData: { elements: ExcalidrawElement[]}
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">Generate Public View Link</ModalHeader>
+              <ModalHeader className="flex flex-col gap-1">
+                Generate Public View Link
+              </ModalHeader>
               <ModalBody>
-                {publicLink ? <> 
-                <Input endContent={<Button onPress={()=>{
-                  navigator.clipboard.writeText(publicLink);
-                  toast.success("Link copied to clipboard");
-                }} className="bg-transparent" size="sm" isIconOnly><CopyIcon /></Button> } readOnly value={publicLink} variant="bordered"/>
-                </> : <>
-                  <DatePicker
-                    showMonthAndYearPickers
-                    className="max-w-md"
-                    label="Expiration Date & Time"
-                    value={expirationDate}
-                    variant="bordered"
-                    onChange={setExpirationDate}
-                    minValue={parseAbsoluteToLocal(new Date(Date.now()+1*24*60*60* 1000).toISOString())}
+                {publicLink ? (
+                  <>
+                    <Input
+                      endContent={
+                        <Button
+                          onPress={() => {
+                            if (publicLink) {
+                              navigator.clipboard.writeText(publicLink);
+                              toast.success("Link copied to clipboard");
+                            }
+                          }}
+                          className="bg-transparent"
+                          size="sm"
+                          isIconOnly
+                        >
+                          <CopyIcon />
+                        </Button>
+                      }
+                      readOnly
+                      value={publicLink}
+                      variant="bordered"
                     />
-                </>}
+                  </>
+                ) : (
+                  <>
+                    <DatePicker
+                      showMonthAndYearPickers
+                      className="max-w-md"
+                      label="Expiration Date & Time"
+                      value={expirationDate}
+                      variant="bordered"
+                      onChange={setExpirationDate}
+                      minValue={parseAbsoluteToLocal(
+                        new Date(
+                          Date.now() + 1 * 24 * 60 * 60 * 1000
+                        ).toISOString()
+                      )}
+                    />
+                  </>
+                )}
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="light" onPress={onClose}>
                   Close
                 </Button>
-                {publicLink ? <Button color="primary" onPress={()=>{setPublicLink(null)}}>Reset</Button> : <Button color="success" variant="light" onPress={()=>{handleGenerateLink("edit")}}>Generate</Button>}
+                {publicLink ? (
+                  <Button
+                    color="primary"
+                    onPress={() => {
+                      setPublicLink(null);
+                    }}
+                  >
+                    Reset
+                  </Button>
+                ) : (
+                  <Button
+                    color="success"
+                    variant="light"
+                    onPress={() => {
+                      handleGenerateLink("edit");
+                    }}
+                  >
+                    Generate
+                  </Button>
+                )}
               </ModalFooter>
             </>
           )}
